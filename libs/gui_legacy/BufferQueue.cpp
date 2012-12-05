@@ -29,7 +29,6 @@
 #include <private/gui/ComposerService.h>
 
 #include <utils/Log.h>
-#include <gui_legacy/SurfaceTexture.h>
 #include <utils/Trace.h>
 
 // Macros for including the BufferQueue name in log messages
