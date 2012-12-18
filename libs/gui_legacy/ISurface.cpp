@@ -23,7 +23,7 @@
 #include <binder/Parcel.h>
 
 #include <gui_legacy/ISurface.h>
-#include <gui_legacy/ISurfaceTexture.h>
+#include <gui_legacy/IGraphicBufferProducer.h>
 
 namespace android {
 
@@ -37,11 +37,11 @@ public:
     {
     }
 
-    virtual sp<ISurfaceTexture> getSurfaceTexture() const {
+    virtual sp<IGraphicBufferProducer> getSurfaceTexture() const {
         Parcel data, reply;
         data.writeInterfaceToken(ISurface::getInterfaceDescriptor());
         remote()->transact(GET_SURFACE_TEXTURE, data, &reply);
-        return interface_cast<ISurfaceTexture>(reply.readStrongBinder());
+        return interface_cast<IGraphicBufferProducer>(reply.readStrongBinder());
     }
 };
 

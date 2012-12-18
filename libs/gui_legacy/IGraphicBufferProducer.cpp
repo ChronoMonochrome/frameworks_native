@@ -25,7 +25,7 @@
 #include <binder/Parcel.h>
 #include <binder/IInterface.h>
 
-#include <gui_legacy/ISurfaceTexture.h>
+#include <gui_legacy/IGraphicBufferProducer.h>
 
 namespace android {
 // ----------------------------------------------------------------------------
@@ -47,17 +47,17 @@ enum {
 };
 
 
-class BpSurfaceTexture : public BpInterface<ISurfaceTexture>
+class BpGraphicBufferProducer : public BpInterface<IGraphicBufferProducer>
 {
 public:
-    BpSurfaceTexture(const sp<IBinder>& impl)
-        : BpInterface<ISurfaceTexture>(impl)
+    BpGraphicBufferProducer(const sp<IBinder>& impl)
+        : BpInterface<IGraphicBufferProducer>(impl)
     {
     }
 
     virtual status_t requestBuffer(int bufferIdx, sp<GraphicBuffer>* buf) {
         Parcel data, reply;
-        data.writeInterfaceToken(ISurfaceTexture::getInterfaceDescriptor());
+        data.writeInterfaceToken(IGraphicBufferProducer::getInterfaceDescriptor());
         data.writeInt32(bufferIdx);
         status_t result =remote()->transact(REQUEST_BUFFER, data, &reply);
         if (result != NO_ERROR) {
@@ -75,7 +75,7 @@ public:
     virtual status_t setBufferCount(int bufferCount)
     {
         Parcel data, reply;
-        data.writeInterfaceToken(ISurfaceTexture::getInterfaceDescriptor());
+        data.writeInterfaceToken(IGraphicBufferProducer::getInterfaceDescriptor());
         data.writeInt32(bufferCount);
         status_t result =remote()->transact(SET_BUFFER_COUNT, data, &reply);
         if (result != NO_ERROR) {
@@ -88,7 +88,7 @@ public:
     virtual status_t dequeueBuffer(int *buf, sp<Fence>& fence,
             uint32_t w, uint32_t h, uint32_t format, uint32_t usage) {
         Parcel data, reply;
-        data.writeInterfaceToken(ISurfaceTexture::getInterfaceDescriptor());
+        data.writeInterfaceToken(IGraphicBufferProducer::getInterfaceDescriptor());
         data.writeInt32(w);
         data.writeInt32(h);
         data.writeInt32(format);
@@ -111,7 +111,7 @@ public:
     virtual status_t queueBuffer(int buf,
             const QueueBufferInput& input, QueueBufferOutput* output) {
         Parcel data, reply;
-        data.writeInterfaceToken(ISurfaceTexture::getInterfaceDescriptor());
+        data.writeInterfaceToken(IGraphicBufferProducer::getInterfaceDescriptor());
         data.writeInt32(buf);
         data.write(input);
         status_t result = remote()->transact(QUEUE_BUFFER, data, &reply);
@@ -126,7 +126,7 @@ public:
     virtual void cancelBuffer(int buf, sp<Fence> fence) {
         Parcel data, reply;
         bool hasFence = fence.get() && fence->isValid();
-        data.writeInterfaceToken(ISurfaceTexture::getInterfaceDescriptor());
+        data.writeInterfaceToken(IGraphicBufferProducer::getInterfaceDescriptor());
         data.writeInt32(buf);
         data.writeInt32(hasFence);
         if (hasFence) {
@@ -137,7 +137,7 @@ public:
 
     virtual int query(int what, int* value) {
         Parcel data, reply;
-        data.writeInterfaceToken(ISurfaceTexture::getInterfaceDescriptor());
+        data.writeInterfaceToken(IGraphicBufferProducer::getInterfaceDescriptor());
         data.writeInt32(what);
         status_t result = remote()->transact(QUERY, data, &reply);
         if (result != NO_ERROR) {
@@ -150,7 +150,7 @@ public:
 
     virtual status_t setSynchronousMode(bool enabled) {
         Parcel data, reply;
-        data.writeInterfaceToken(ISurfaceTexture::getInterfaceDescriptor());
+        data.writeInterfaceToken(IGraphicBufferProducer::getInterfaceDescriptor());
         data.writeInt32(enabled);
         status_t result = remote()->transact(SET_SYNCHRONOUS_MODE, data, &reply);
         if (result != NO_ERROR) {
@@ -191,7 +191,7 @@ public:
 
     virtual status_t connect(int api, QueueBufferOutput* output) {
         Parcel data, reply;
-        data.writeInterfaceToken(ISurfaceTexture::getInterfaceDescriptor());
+        data.writeInterfaceToken(IGraphicBufferProducer::getInterfaceDescriptor());
         data.writeInt32(api);
         status_t result = remote()->transact(CONNECT, data, &reply);
         if (result != NO_ERROR) {
@@ -204,7 +204,7 @@ public:
 
     virtual status_t disconnect(int api) {
         Parcel data, reply;
-        data.writeInterfaceToken(ISurfaceTexture::getInterfaceDescriptor());
+        data.writeInterfaceToken(IGraphicBufferProducer::getInterfaceDescriptor());
         data.writeInt32(api);
         status_t result =remote()->transact(DISCONNECT, data, &reply);
         if (result != NO_ERROR) {
@@ -215,16 +215,16 @@ public:
     }
 };
 
-IMPLEMENT_META_INTERFACE(SurfaceTexture, "android.gui.SurfaceTexture");
+IMPLEMENT_META_INTERFACE(GraphicBufferProducer, "android.gui.SurfaceTexture");
 
 // ----------------------------------------------------------------------
 
-status_t BnSurfaceTexture::onTransact(
+status_t BnGraphicBufferProducer::onTransact(
     uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags)
 {
     switch(code) {
         case REQUEST_BUFFER: {
-            CHECK_INTERFACE(ISurfaceTexture, data, reply);
+            CHECK_INTERFACE(IGraphicBufferProducer, data, reply);
             int bufferIdx   = data.readInt32();
             sp<GraphicBuffer> buffer;
             int result = requestBuffer(bufferIdx, &buffer);
@@ -236,14 +236,14 @@ status_t BnSurfaceTexture::onTransact(
             return NO_ERROR;
         } break;
         case SET_BUFFER_COUNT: {
-            CHECK_INTERFACE(ISurfaceTexture, data, reply);
+            CHECK_INTERFACE(IGraphicBufferProducer, data, reply);
             int bufferCount = data.readInt32();
             int result = setBufferCount(bufferCount);
             reply->writeInt32(result);
             return NO_ERROR;
         } break;
         case DEQUEUE_BUFFER: {
-            CHECK_INTERFACE(ISurfaceTexture, data, reply);
+            CHECK_INTERFACE(IGraphicBufferProducer, data, reply);
             uint32_t w      = data.readInt32();
             uint32_t h      = data.readInt32();
             uint32_t format = data.readInt32();
@@ -261,7 +261,7 @@ status_t BnSurfaceTexture::onTransact(
             return NO_ERROR;
         } break;
         case QUEUE_BUFFER: {
-            CHECK_INTERFACE(ISurfaceTexture, data, reply);
+            CHECK_INTERFACE(IGraphicBufferProducer, data, reply);
             int buf = data.readInt32();
             QueueBufferInput input(data);
             QueueBufferOutput* const output =
@@ -272,7 +272,7 @@ status_t BnSurfaceTexture::onTransact(
             return NO_ERROR;
         } break;
         case CANCEL_BUFFER: {
-            CHECK_INTERFACE(ISurfaceTexture, data, reply);
+            CHECK_INTERFACE(IGraphicBufferProducer, data, reply);
             int buf = data.readInt32();
             sp<Fence> fence;
             bool hasFence = data.readInt32();
@@ -284,7 +284,7 @@ status_t BnSurfaceTexture::onTransact(
             return NO_ERROR;
         } break;
         case QUERY: {
-            CHECK_INTERFACE(ISurfaceTexture, data, reply);
+            CHECK_INTERFACE(IGraphicBufferProducer, data, reply);
             int value;
             int what = data.readInt32();
             int res = query(what, &value);
@@ -293,7 +293,7 @@ status_t BnSurfaceTexture::onTransact(
             return NO_ERROR;
         } break;
         case SET_SYNCHRONOUS_MODE: {
-            CHECK_INTERFACE(ISurfaceTexture, data, reply);
+            CHECK_INTERFACE(IGraphicBufferProducer, data, reply);
             bool enabled = data.readInt32();
             status_t res = setSynchronousMode(enabled);
             reply->writeInt32(res);
@@ -318,7 +318,7 @@ status_t BnSurfaceTexture::onTransact(
         } break;
 #endif
         case CONNECT: {
-            CHECK_INTERFACE(ISurfaceTexture, data, reply);
+            CHECK_INTERFACE(IGraphicBufferProducer, data, reply);
             int api = data.readInt32();
             QueueBufferOutput* const output =
                     reinterpret_cast<QueueBufferOutput *>(
@@ -328,7 +328,7 @@ status_t BnSurfaceTexture::onTransact(
             return NO_ERROR;
         } break;
         case DISCONNECT: {
-            CHECK_INTERFACE(ISurfaceTexture, data, reply);
+            CHECK_INTERFACE(IGraphicBufferProducer, data, reply);
             int api = data.readInt32();
             status_t res = disconnect(api);
             reply->writeInt32(res);
@@ -344,11 +344,11 @@ static bool isValid(const sp<Fence>& fence) {
     return fence.get() && fence->isValid();
 }
 
-ISurfaceTexture::QueueBufferInput::QueueBufferInput(const Parcel& parcel) {
+IGraphicBufferProducer::QueueBufferInput::QueueBufferInput(const Parcel& parcel) {
     parcel.read(*this);
 }
 
-size_t ISurfaceTexture::QueueBufferInput::getFlattenedSize() const
+size_t IGraphicBufferProducer::QueueBufferInput::getFlattenedSize() const
 {
     return sizeof(timestamp)
          + sizeof(crop)
@@ -358,12 +358,12 @@ size_t ISurfaceTexture::QueueBufferInput::getFlattenedSize() const
          + (isValid(fence) ? fence->getFlattenedSize() : 0);
 }
 
-size_t ISurfaceTexture::QueueBufferInput::getFdCount() const
+size_t IGraphicBufferProducer::QueueBufferInput::getFdCount() const
 {
     return isValid(fence) ? fence->getFdCount() : 0;
 }
 
-status_t ISurfaceTexture::QueueBufferInput::flatten(void* buffer, size_t size,
+status_t IGraphicBufferProducer::QueueBufferInput::flatten(void* buffer, size_t size,
         int fds[], size_t count) const
 {
     status_t err = NO_ERROR;
@@ -380,7 +380,7 @@ status_t ISurfaceTexture::QueueBufferInput::flatten(void* buffer, size_t size,
     return err;
 }
 
-status_t ISurfaceTexture::QueueBufferInput::unflatten(void const* buffer,
+status_t IGraphicBufferProducer::QueueBufferInput::unflatten(void const* buffer,
         size_t size, int fds[], size_t count)
 {
     status_t err = NO_ERROR;

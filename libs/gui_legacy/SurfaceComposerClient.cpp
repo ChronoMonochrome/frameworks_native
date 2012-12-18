@@ -155,7 +155,8 @@ public:
     status_t setLayerStack(const sp<SurfaceComposerClient>& client,
             SurfaceID id, uint32_t layerStack);
 
-    void setDisplaySurface(const sp<IBinder>& token, const sp<ISurfaceTexture>& surface);
+    void setDisplaySurface(const sp<IBinder>& token,
+            const sp<IGraphicBufferProducer>& bufferProducer);
     void setDisplayLayerStack(const sp<IBinder>& token, uint32_t layerStack);
     void setDisplayProjection(const sp<IBinder>& token,
             uint32_t orientation,
@@ -365,10 +366,10 @@ DisplayState& Composer::getDisplayStateLocked(const sp<IBinder>& token) {
 }
 
 void Composer::setDisplaySurface(const sp<IBinder>& token,
-        const sp<ISurfaceTexture>& surface) {
+        const sp<IGraphicBufferProducer>& bufferProducer) {
     Mutex::Autolock _l(mLock);
     DisplayState& s(getDisplayStateLocked(token));
-    s.surface = surface;
+    s.surface = bufferProducer;
     s.what |= DisplayState::eSurfaceChanged;
 }
 
@@ -588,8 +589,8 @@ status_t SurfaceComposerClient::setOrientation(int32_t dpy, int orientation, uin
 // ----------------------------------------------------------------------------
 
 void SurfaceComposerClient::setDisplaySurface(const sp<IBinder>& token,
-        const sp<ISurfaceTexture>& surface) {
-    Composer::getInstance().setDisplaySurface(token, surface);
+        const sp<IGraphicBufferProducer>& bufferProducer) {
+    Composer::getInstance().setDisplaySurface(token, bufferProducer);
 }
 
 void SurfaceComposerClient::setDisplayLayerStack(const sp<IBinder>& token,

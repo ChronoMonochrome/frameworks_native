@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ANDROID_GUI_ISURFACETEXTURE_H
-#define ANDROID_GUI_ISURFACETEXTURE_H
+#ifndef ANDROID_GUI_IGRAPHICBUFFERPRODUCER_H
+#define ANDROID_GUI_IGRAPHICBUFFERPRODUCER_H
 
 #include <stdint.h>
 #include <sys/types.h>
@@ -44,16 +44,15 @@ class SurfaceTextureClient;
  * producer calls dequeueBuffer() to get an empty buffer, fills it with
  * data, then calls queueBuffer() to make it available to the consumer.
  *
- * The BnSurfaceTexture and BpSurfaceTexture classes provide the Binder
- * IPC implementation.
+ * The BnGraphicBufferProducer and BpGraphicBufferProducer classes provide
+ * the Binder IPC implementation.
  *
- * TODO: rename to IGraphicBufferProducer (IBufferProducer?
- * IBufferQueueProducer?)
+ * This class was previously called ISurfaceTexture.
  */
-class ISurfaceTexture : public IInterface
+class IGraphicBufferProducer : public IInterface
 {
 public:
-    DECLARE_META_INTERFACE(SurfaceTexture);
+    DECLARE_META_INTERFACE(GraphicBufferProducer);
 
     enum {
         BUFFER_NEEDS_REALLOCATION = 0x1,
@@ -61,8 +60,8 @@ public:
     };
 
     // requestBuffer requests a new buffer for the given index. The server (i.e.
-    // the ISurfaceTexture implementation) assigns the newly created buffer to
-    // the given slot index, and the client is expected to mirror the
+    // the IGraphicBufferProducer implementation) assigns the newly created
+    // buffer to the given slot index, and the client is expected to mirror the
     // slot->buffer mapping so that it's not necessary to transfer a
     // GraphicBuffer for every dequeue operation.
     virtual status_t requestBuffer(int slot, sp<GraphicBuffer>* buf) = 0;
@@ -180,46 +179,32 @@ public:
     // The default mode is asynchronous.
     virtual status_t setSynchronousMode(bool enabled) = 0;
 
-#ifdef QCOM_BSP
-   // setBufferSize enables to specify the user defined size of the buffer
-   // that needs to be allocated by surfaceflinger for its client. This is
-   // useful for cases where the client doesn't want the gralloc to calculate
-   // buffer size. client should reset this value to 0, if it wants gralloc to
-   // calculate the size for the buffer. this will take effect from next
-   // dequeue buffer.
-    virtual status_t setBuffersSize(int size) = 0;
-
-    // update buffer width, height and format information from the client
-    // which will take effect in the next queue buffer.
-    virtual status_t updateBuffersGeometry(int w, int h, int f) = 0;
-#endif
-
-    // connect attempts to connect a client API to the SurfaceTexture.  This
-    // must be called before any other ISurfaceTexture methods are called except
-    // for getAllocator.
+    // connect attempts to connect a client API to the IGraphicBufferProducer.
+    // This must be called before any other IGraphicBufferProducer methods are
+    // called except for getAllocator.
     //
     // This method will fail if the connect was previously called on the
-    // SurfaceTexture and no corresponding disconnect call was made.
+    // IGraphicBufferProducer and no corresponding disconnect call was made.
     //
     // outWidth, outHeight and outTransform are filled with the default width
     // and height of the window and current transform applied to buffers,
     // respectively.
     virtual status_t connect(int api, QueueBufferOutput* output) = 0;
 
-    // disconnect attempts to disconnect a client API from the SurfaceTexture.
-    // Calling this method will cause any subsequent calls to other
-    // ISurfaceTexture methods to fail except for getAllocator and connect.
-    // Successfully calling connect after this will allow the other methods to
-    // succeed again.
+    // disconnect attempts to disconnect a client API from the
+    // IGraphicBufferProducer.  Calling this method will cause any subsequent
+    // calls to other IGraphicBufferProducer methods to fail except for
+    // getAllocator and connect.  Successfully calling connect after this will
+    // allow the other methods to succeed again.
     //
-    // This method will fail if the the SurfaceTexture is not currently
+    // This method will fail if the the IGraphicBufferProducer is not currently
     // connected to the specified client API.
     virtual status_t disconnect(int api) = 0;
 };
 
 // ----------------------------------------------------------------------------
 
-class BnSurfaceTexture : public BnInterface<ISurfaceTexture>
+class BnGraphicBufferProducer : public BnInterface<IGraphicBufferProducer>
 {
 public:
     virtual status_t    onTransact( uint32_t code,
@@ -231,4 +216,4 @@ public:
 // ----------------------------------------------------------------------------
 }; // namespace android
 
-#endif // ANDROID_GUI_ISURFACETEXTURE_H
+#endif // ANDROID_GUI_IGRAPHICBUFFERPRODUCER_H
