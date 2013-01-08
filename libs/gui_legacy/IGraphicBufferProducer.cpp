@@ -215,7 +215,7 @@ public:
     }
 };
 
-IMPLEMENT_META_INTERFACE(GraphicBufferProducer, "android.gui.SurfaceTexture");
+IMPLEMENT_META_INTERFACE(GraphicBufferProducer, "android.gui.IGraphicBufferProducer");
 
 // ----------------------------------------------------------------------
 
