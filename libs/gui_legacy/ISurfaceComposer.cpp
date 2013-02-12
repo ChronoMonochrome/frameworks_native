@@ -30,7 +30,7 @@
 #include <gui_legacy/ISurfaceComposer.h>
 #include <gui_legacy/IGraphicBufferProducer.h>
 
-#include <private/gui/LayerState.h>
+#include <private/gui_legacy/LayerState.h>
 
 #include <ui/DisplayInfo.h>
 
