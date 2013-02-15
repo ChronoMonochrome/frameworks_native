@@ -21,6 +21,7 @@
 #include <sys/types.h>
 
 #include <binder/IBinder.h>
+#include <binder/IMemory.h>
 
 #include <utils/RefBase.h>
 #include <utils/Singleton.h>
@@ -29,7 +30,7 @@
 
 #include <ui/PixelFormat.h>
 
-#include <gui_legacy/Surface.h>
+#include <gui_legacy/SurfaceControl.h>
 
 namespace android {
 
