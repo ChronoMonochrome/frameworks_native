@@ -37,7 +37,7 @@ struct DisplayInfo {
     nsecs_t appVsyncOffset;
     nsecs_t presentationDeadline;
 #ifdef HAVE_PIXEL_FORMAT_INFO
-    // TODO: this needs to go away (currently needed only by webkit)
+    // needed only by old blobs
     PixelFormatInfo pixelFormatInfo;
 #endif
 };
