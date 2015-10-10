@@ -17,19 +17,17 @@
 #define LOG_TAG "BufferQueue_test"
 //#define LOG_NDEBUG 0
 
-#include <gui/BufferQueue.h>
-#include <gui/IProducerListener.h>
+#include <gtest/gtest.h>
+
+#include <utils/String8.h>
+#include <utils/threads.h>
 
 #include <ui/GraphicBuffer.h>
 
 #include <binder/IPCThreadState.h>
 #include <binder/IServiceManager.h>
 #include <binder/ProcessState.h>
-
-#include <utils/String8.h>
-#include <utils/threads.h>
-
-#include <gtest/gtest.h>
+#include <gui/BufferQueue.h>
 
 namespace android {
 
@@ -143,8 +141,7 @@ TEST_F(BufferQueueTest, AcquireBuffer_ExceedsMaxAcquireCount_Fails) {
     sp<DummyConsumer> dc(new DummyConsumer);
     mConsumer->consumerConnect(dc, false);
     IGraphicBufferProducer::QueueBufferOutput qbo;
-    mProducer->connect(new DummyProducerListener, NATIVE_WINDOW_API_CPU, false,
-            &qbo);
+    mProducer->connect(NULL, NATIVE_WINDOW_API_CPU, false, &qbo);
     mProducer->setBufferCount(4);
 
     int slot;
@@ -210,8 +207,8 @@ TEST_F(BufferQueueTest, DetachAndReattachOnProducerSide) {
     sp<DummyConsumer> dc(new DummyConsumer);
     ASSERT_EQ(OK, mConsumer->consumerConnect(dc, false));
     IGraphicBufferProducer::QueueBufferOutput output;
-    ASSERT_EQ(OK, mProducer->connect(new DummyProducerListener,
-            NATIVE_WINDOW_API_CPU, false, &output));
+    ASSERT_EQ(OK,
+            mProducer->connect(NULL, NATIVE_WINDOW_API_CPU, false, &output));
 
     ASSERT_EQ(BAD_VALUE, mProducer->detachBuffer(-1)); // Index too low
     ASSERT_EQ(BAD_VALUE, mProducer->detachBuffer(
@@ -263,8 +260,8 @@ TEST_F(BufferQueueTest, DetachAndReattachOnConsumerSide) {
     sp<DummyConsumer> dc(new DummyConsumer);
     ASSERT_EQ(OK, mConsumer->consumerConnect(dc, false));
     IGraphicBufferProducer::QueueBufferOutput output;
-    ASSERT_EQ(OK, mProducer->connect(new DummyProducerListener,
-            NATIVE_WINDOW_API_CPU, false, &output));
+    ASSERT_EQ(OK,
+            mProducer->connect(NULL, NATIVE_WINDOW_API_CPU, false, &output));
 
     int slot;
     sp<Fence> fence;
@@ -321,8 +318,8 @@ TEST_F(BufferQueueTest, MoveFromConsumerToProducer) {
     sp<DummyConsumer> dc(new DummyConsumer);
     ASSERT_EQ(OK, mConsumer->consumerConnect(dc, false));
     IGraphicBufferProducer::QueueBufferOutput output;
-    ASSERT_EQ(OK, mProducer->connect(new DummyProducerListener,
-            NATIVE_WINDOW_API_CPU, false, &output));
+    ASSERT_EQ(OK,
+            mProducer->connect(NULL, NATIVE_WINDOW_API_CPU, false, &output));
 
     int slot;
     sp<Fence> fence;

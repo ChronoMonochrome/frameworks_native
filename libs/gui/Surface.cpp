@@ -28,7 +28,6 @@
 
 #include <ui/Fence.h>
 
-#include <gui/IProducerListener.h>
 #include <gui/ISurfaceComposer.h>
 #include <gui/SurfaceComposerClient.h>
 #include <gui/GLConsumer.h>
@@ -548,10 +547,10 @@ int Surface::dispatchSetSidebandStream(va_list args) {
 int Surface::connect(int api) {
     ATRACE_CALL();
     ALOGV("Surface::connect");
-    static sp<IProducerListener> listener = new DummyProducerListener();
+    static sp<BBinder> sLife = new BBinder();
     Mutex::Autolock lock(mMutex);
     IGraphicBufferProducer::QueueBufferOutput output;
-    int err = mGraphicBufferProducer->connect(listener, api, mProducerControlledByApp, &output);
+    int err = mGraphicBufferProducer->connect(sLife, api, mProducerControlledByApp, &output);
     if (err == NO_ERROR) {
         uint32_t numPendingBuffers = 0;
         uint32_t hint = 0;

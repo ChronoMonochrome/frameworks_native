@@ -26,7 +26,6 @@
 #include <gui/BufferQueueCore.h>
 #include <gui/IConsumerListener.h>
 #include <gui/IGraphicBufferAlloc.h>
-#include <gui/IProducerListener.h>
 #include <gui/ISurfaceComposer.h>
 #include <private/gui/ComposerService.h>
 
@@ -50,7 +49,7 @@ BufferQueueCore::BufferQueueCore(const sp<IGraphicBufferAlloc>& allocator) :
     mConsumerListener(),
     mConsumerUsageBits(0),
     mConnectedApi(NO_CONNECTED_API),
-    mConnectedProducerListener(),
+    mConnectedProducerToken(),
     mSlots(),
     mQueue(),
     mOverrideMaxBufferCount(0),

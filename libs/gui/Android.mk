@@ -21,7 +21,6 @@ LOCAL_SRC_FILES:= \
 	IDisplayEventConnection.cpp \
 	IGraphicBufferAlloc.cpp \
 	IGraphicBufferProducer.cpp \
-	IProducerListener.cpp \
 	ISensorEventConnection.cpp \
 	ISensorServer.cpp \
 	ISurfaceComposer.cpp \
