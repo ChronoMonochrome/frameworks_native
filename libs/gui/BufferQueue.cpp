@@ -165,7 +165,7 @@ status_t BufferQueue::consumerDisconnect() {
     return mConsumer->disconnect();
 }
 
-status_t BufferQueue::getReleasedBuffers(uint64_t* slotMask) {
+status_t BufferQueue::getReleasedBuffers(uint32_t* slotMask) {
     return mConsumer->getReleasedBuffers(slotMask);
 }
 
