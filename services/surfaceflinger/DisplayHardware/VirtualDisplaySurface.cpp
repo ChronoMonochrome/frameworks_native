@@ -257,15 +257,6 @@ void VirtualDisplaySurface::onFrameCommitted() {
 void VirtualDisplaySurface::dump(String8& result) const {
 }
 
-void VirtualDisplaySurface::resizeBuffers(const uint32_t w, const uint32_t h) {
-    uint32_t tmpW, tmpH, transformHint, numPendingBuffers;
-    mQueueBufferOutput.deflate(&tmpW, &tmpH, &transformHint, &numPendingBuffers);
-    mQueueBufferOutput.inflate(w, h, transformHint, numPendingBuffers);
-
-    mSinkBufferWidth = w;
-    mSinkBufferHeight = h;
-}
-
 status_t VirtualDisplaySurface::requestBuffer(int pslot,
         sp<GraphicBuffer>* outBuf) {
     if (mDisplayId < 0)
