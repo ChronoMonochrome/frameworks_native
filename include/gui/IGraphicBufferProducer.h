@@ -423,8 +423,16 @@ public:
     // allocated. This is most useful to avoid an allocation delay during
     // dequeueBuffer. If there are already the maximum number of buffers
     // allocated, this function has no effect.
-    virtual void allocateBuffers(bool async, uint32_t width, uint32_t height,
-            uint32_t format, uint32_t usage) = 0;
+    void allocateBuffers(bool async, uint32_t width, uint32_t height,
+            uint32_t format, uint32_t usage) {
+        Parcel data, reply;
+        data.writeInterfaceToken(IGraphicBufferProducer::getInterfaceDescriptor());
+        data.writeInt32(static_cast<int32_t>(async));
+        data.writeInt32(static_cast<int32_t>(width));
+        data.writeInt32(static_cast<int32_t>(height));
+        data.writeInt32(static_cast<int32_t>(format));
+        data.writeInt32(static_cast<int32_t>(usage));
+    }
 };
 
 // ----------------------------------------------------------------------------
