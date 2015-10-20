@@ -42,5 +42,28 @@ MemoryBase::~MemoryBase()
 {
 }
 
+#ifdef STE_HARDWARE
+sp<IMemoryHeap> android::MemoryBase::getMemory(long* offset, unsigned int* size) const
+{
+    ssize_t offset_o;
+    size_t size_o;
+    sp<IMemoryHeap> res;
+
+    res = getMemory(&offset_o, & size_o);
+    *offset = offset_o;
+    *size = size_o;
+
+    return res;
+}
+#endif
+
 // ---------------------------------------------------------------------------
 }; // namespace android
+
+#ifndef __LP64__
+// Backwards compatibility for libdatabase_sqlcipher (http://b/8253769).
+extern "C" void _ZN7android10MemoryBaseC1ERKNS_2spINS_11IMemoryHeapEEEij(void*, void*, ssize_t, size_t);
+extern "C" void _ZN7android10MemoryBaseC1ERKNS_2spINS_11IMemoryHeapEEElj(void* obj, void* h, long o, unsigned int size) {
+    _ZN7android10MemoryBaseC1ERKNS_2spINS_11IMemoryHeapEEEij(obj, h, o, size);
+}
+#endif
