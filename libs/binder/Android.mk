@@ -49,7 +49,7 @@ ifneq ($(TARGET_IS_64_BIT),true)
 LOCAL_CFLAGS += -DBINDER_IPC_32BIT=1
 endif
 endif
-LOCAL_CFLAGS += -Werror
+LOCAL_CFLAGS += 
 include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
@@ -61,5 +61,5 @@ ifneq ($(TARGET_IS_64_BIT),true)
 LOCAL_CFLAGS += -DBINDER_IPC_32BIT=1
 endif
 endif
-LOCAL_CFLAGS += -Werror
+LOCAL_CFLAGS += 
 include $(BUILD_STATIC_LIBRARY)

@@ -89,7 +89,7 @@ else
     LOCAL_CFLAGS += -DMAX_VIRTUAL_DISPLAY_DIMENSION=0
 endif
 
-LOCAL_CFLAGS += -fvisibility=hidden -Wno-error=unused-parameter -Werror=format
+LOCAL_CFLAGS += -fvisibility=hidden -Wno-error=unused-parameter 
 LOCAL_CFLAGS += -std=c++11
 
 LOCAL_SHARED_LIBRARIES := \
@@ -108,7 +108,7 @@ LOCAL_SHARED_LIBRARIES := \
 
 LOCAL_MODULE := libsurfaceflinger
 
-LOCAL_CFLAGS += -Wall -Werror -Wno-error=unused-parameter -Wunused -Wunreachable-code
+LOCAL_CFLAGS += -Wall  -Wno-error=unused-parameter -Wunused -Wunreachable-code
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -141,7 +141,7 @@ ifdef TARGET_32_BIT_SURFACEFLINGER
 LOCAL_32_BIT_ONLY := true
 endif
 
-LOCAL_CFLAGS += -Wall -Werror -Wno-error=unused-parameter -Wunused -Wunreachable-code
+LOCAL_CFLAGS += -Wall  -Wno-error=unused-parameter -Wunused -Wunreachable-code
 
 include $(BUILD_EXECUTABLE)
 
@@ -165,7 +165,7 @@ LOCAL_SHARED_LIBRARIES := \
 
 LOCAL_MODULE := libsurfaceflinger_ddmconnection
 
-LOCAL_CFLAGS += -Wall -Werror -Wno-error=unused-parameter -Wunused -Wunreachable-code
+LOCAL_CFLAGS += -Wall  -Wno-error=unused-parameter -Wunused -Wunreachable-code
 
 include $(BUILD_SHARED_LIBRARY)
 endif # libnativehelper

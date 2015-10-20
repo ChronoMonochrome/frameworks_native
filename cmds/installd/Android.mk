@@ -1,7 +1,7 @@
 LOCAL_PATH := $(call my-dir)
 
 common_src_files := commands.cpp utils.cpp
-common_cflags := -Wall -Werror
+common_cflags := -Wall 
 
 #
 # Static library used in testing and executable
