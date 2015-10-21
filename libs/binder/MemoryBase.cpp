@@ -25,6 +25,11 @@ namespace android {
 
 // ---------------------------------------------------------------------------
 
+
+#ifdef STE_HARDWARE
+extern "C" void _ZN7android10MemoryBaseC2ERKNS_2spINS_11IMemoryHeapEEElj() __attribute__((alias("_ZN7android10MemoryBaseC1ERKNS_2spINS_11IMemoryHeapEEElj")));
+#endif
+
 MemoryBase::MemoryBase(const sp<IMemoryHeap>& heap,
         ssize_t offset, size_t size)
     : mSize(size), mOffset(offset), mHeap(heap)
@@ -56,6 +61,7 @@ sp<IMemoryHeap> android::MemoryBase::getMemory(long* offset, unsigned int* size)
     return res;
 }
 #endif
+
 
 // ---------------------------------------------------------------------------
 }; // namespace android
