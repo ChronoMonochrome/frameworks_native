@@ -166,7 +166,7 @@ status_t GraphicBuffer::initSize(uint32_t inWidth, uint32_t inHeight,
         PixelFormat inFormat, uint32_t inUsage)
 {
     GraphicBufferAllocator& allocator = GraphicBufferAllocator::get();
-    uint32_t outStride = 0;
+    int32_t outStride = 0;
     status_t err = allocator.alloc(inWidth, inHeight, inFormat, inUsage,
             &handle, &outStride);
     if (err == NO_ERROR) {
