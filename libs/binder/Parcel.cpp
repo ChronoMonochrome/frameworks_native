@@ -823,6 +823,11 @@ status_t Parcel::writeString16(const String16& str)
     return writeString16(str.string(), str.size());
 }
 
+#ifdef STE_HARDWARE
+
+extern "C" void _ZN7android6Parcel13writeString16EPKtj(const char16_t* str, size_t len) __attribute__((alias("_ZN7android6Parcel13writeString16EPKDsj")));
+#endif
+
 status_t Parcel::writeString16(const char16_t* str, size_t len)
 {
     if (str == NULL) return writeInt32(-1);
