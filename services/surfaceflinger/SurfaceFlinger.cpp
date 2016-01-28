@@ -88,6 +88,14 @@ EGLAPI const char* eglQueryStringImplementationANDROID(EGLDisplay dpy, EGLint na
 
 namespace android {
 
+// This works around the lack of support for the sync framework on some
+// devices.
+#ifdef RUNNING_WITHOUT_SYNC_FRAMEWORK
+static const bool runningWithoutSyncFramework = true;
+#else
+static const bool runningWithoutSyncFramework = false;
+#endif
+
 // This is the phase offset in nanoseconds of the software vsync event
 // relative to the vsync event reported by HWComposer.  The software vsync
 // event is when SurfaceFlinger and Choreographer-based applications run each
@@ -314,13 +322,10 @@ void SurfaceFlinger::deleteTextureAsync(uint32_t texture) {
 
 class DispSyncSource : public VSyncSource, private DispSync::Callback {
 public:
-    DispSyncSource(DispSync* dispSync, nsecs_t phaseOffset, bool traceVsync,
-        const char* label) :
+    DispSyncSource(DispSync* dispSync, nsecs_t phaseOffset, bool traceVsync) :
             mValue(0),
             mPhaseOffset(phaseOffset),
             mTraceVsync(traceVsync),
-            mVsyncOnLabel(String8::format("VsyncOn-%s", label)),
-            mVsyncEventLabel(String8::format("VSYNC-%s", label)),
             mDispSync(dispSync) {}
 
     virtual ~DispSyncSource() {}
@@ -335,7 +340,7 @@ public:
                 ALOGE("error registering vsync callback: %s (%d)",
                         strerror(-err), err);
             }
-            //ATRACE_INT(mVsyncOnLabel.string(), 1);
+            ATRACE_INT("VsyncOn", 1);
         } else {
             status_t err = mDispSync->removeEventListener(
                     static_cast<DispSync::Callback*>(this));
@@ -343,7 +348,7 @@ public:
                 ALOGE("error unregistering vsync callback: %s (%d)",
                         strerror(-err), err);
             }
-            //ATRACE_INT(mVsyncOnLabel.string(), 0);
+            ATRACE_INT("VsyncOn", 0);
         }
     }
 
@@ -361,7 +366,7 @@ private:
 
             if (mTraceVsync) {
                 mValue = (mValue + 1) % 2;
-                ATRACE_INT(mVsyncEventLabel.string(), mValue);
+                ATRACE_INT("VSYNC", mValue);
             }
         }
 
@@ -374,8 +379,6 @@ private:
 
     const nsecs_t mPhaseOffset;
     const bool mTraceVsync;
-    const String8 mVsyncOnLabel;
-    const String8 mVsyncEventLabel;
 
     DispSync* mDispSync;
     sp<VSyncSource::Callback> mCallback;
@@ -441,10 +444,10 @@ void SurfaceFlinger::init() {
 
     // start the EventThread
     sp<VSyncSource> vsyncSrc = new DispSyncSource(&mPrimaryDispSync,
-            vsyncPhaseOffsetNs, true, "app");
+            vsyncPhaseOffsetNs, true);
     mEventThread = new EventThread(vsyncSrc);
     sp<VSyncSource> sfVsyncSrc = new DispSyncSource(&mPrimaryDispSync,
-            sfVsyncPhaseOffsetNs, true, "sf");
+            sfVsyncPhaseOffsetNs, false);
     mSFEventThread = new EventThread(sfVsyncSrc);
     mEventQueue.setEventThread(mSFEventThread);
 
@@ -866,7 +869,7 @@ void SurfaceFlinger::postComposition()
         }
     }
 
-    if (kIgnorePresentFences) {
+    if (runningWithoutSyncFramework) {
         const sp<const DisplayDevice> hw(getDefaultDisplayDevice());
         if (hw->isScreenAcquired()) {
             enableHardwareVsync();
