@@ -2823,7 +2823,6 @@ void SurfaceFlinger::renderScreenImplLocked(
 
     // compositionComplete is needed for older driver
     hw->compositionComplete();
-    hw->setViewportAndProjection();
 }
 
 
@@ -2904,6 +2903,8 @@ status_t SurfaceFlinger::captureScreenImplLocked(
         }
         native_window_api_disconnect(window, NATIVE_WINDOW_API_EGL);
     }
+
+    hw->setViewportAndProjection();
 
     return result;
 }
