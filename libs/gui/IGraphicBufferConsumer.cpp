@@ -292,18 +292,14 @@ public:
         return reply.readInt32();
     }
 
-    virtual status_t getReleasedBuffers(uint64_t* slotMask) {
+    virtual status_t getReleasedBuffers(uint32_t* slotMask) {
         Parcel data, reply;
-        if (slotMask == NULL) {
-            ALOGE("getReleasedBuffers: slotMask must not be NULL");
-            return BAD_VALUE;
-        }
         data.writeInterfaceToken(IGraphicBufferConsumer::getInterfaceDescriptor());
         status_t result = remote()->transact(GET_RELEASED_BUFFERS, data, &reply);
         if (result != NO_ERROR) {
             return result;
         }
-        *slotMask = reply.readInt64();
+        *slotMask = reply.readInt32();
         return reply.readInt32();
     }
 
@@ -478,9 +474,9 @@ status_t BnGraphicBufferConsumer::onTransact(
         } break;
         case GET_RELEASED_BUFFERS: {
             CHECK_INTERFACE(IGraphicBufferConsumer, data, reply);
-            uint64_t slotMask;
+            uint32_t slotMask;
             status_t result = getReleasedBuffers(&slotMask);
-            reply->writeInt64(slotMask);
+            reply->writeInt32(slotMask);
             reply->writeInt32(result);
             return NO_ERROR;
         } break;

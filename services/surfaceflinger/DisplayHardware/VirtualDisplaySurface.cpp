@@ -254,7 +254,7 @@ void VirtualDisplaySurface::onFrameCommitted() {
     resetPerFrameState();
 }
 
-void VirtualDisplaySurface::dump(String8& /* result */) const {
+void VirtualDisplaySurface::dump(String8& result) const {
 }
 
 void VirtualDisplaySurface::resizeBuffers(const uint32_t w, const uint32_t h) {
@@ -296,19 +296,19 @@ status_t VirtualDisplaySurface::dequeueBuffer(Source source,
     int pslot = mapSource2ProducerSlot(source, *sslot);
     VDS_LOGV("dequeueBuffer(%s): sslot=%d pslot=%d result=%d",
             dbgSourceStr(source), *sslot, pslot, result);
-    uint64_t sourceBit = static_cast<uint64_t>(source) << pslot;
+    uint32_t sourceBit = static_cast<uint32_t>(source) << pslot;
 
-    if ((mProducerSlotSource & (1ULL << pslot)) != sourceBit) {
+    if ((mProducerSlotSource & (1u << pslot)) != sourceBit) {
         // This slot was previously dequeued from the other source; must
         // re-request the buffer.
         result |= BUFFER_NEEDS_REALLOCATION;
-        mProducerSlotSource &= ~(1ULL << pslot);
+        mProducerSlotSource &= ~(1u << pslot);
         mProducerSlotSource |= sourceBit;
     }
 
     if (result & RELEASE_ALL_BUFFERS) {
         for (uint32_t i = 0; i < BufferQueue::NUM_BUFFER_SLOTS; i++) {
-            if ((mProducerSlotSource & (1ULL << i)) == sourceBit)
+            if ((mProducerSlotSource & (1u << i)) == sourceBit)
                 mProducerBuffers[i].clear();
         }
     }

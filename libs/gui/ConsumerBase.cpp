@@ -123,10 +123,10 @@ void ConsumerBase::onBuffersReleased() {
         return;
     }
 
-    uint64_t mask = 0;
+    uint32_t mask = 0;
     mConsumer->getReleasedBuffers(&mask);
     for (int i = 0; i < BufferQueue::NUM_BUFFER_SLOTS; i++) {
-        if (mask & (1ULL << i)) {
+        if (mask & (1 << i)) {
             freeBufferLocked(i);
         }
     }
