@@ -57,13 +57,23 @@ protected:
 public:
     typedef ConsumerBase::FrameAvailableListener FrameAvailableListener;
 
-    // GLConsumer constructs a new GLConsumer object. If the constructor with
-    // the tex parameter is used, tex indicates the name of the OpenGL ES
-    // texture to which images are to be streamed. texTarget specifies the
-    // OpenGL ES texture target to which the texture will be bound in
-    // updateTexImage. useFenceSync specifies whether fences should be used to
-    // synchronize access to buffers if that behavior is enabled at
-    // compile-time.
+    // GLConsumer constructs a new GLConsumer object. tex indicates the
+    // name of the OpenGL ES texture to which images are to be streamed.
+    // allowSynchronousMode specifies whether or not synchronous mode can be
+    // enabled. texTarget specifies the OpenGL ES texture target to which the
+    // texture will be bound in updateTexImage. useFenceSync specifies whether
+    // fences should be used to synchronize access to buffers if that behavior
+    // is enabled at compile-time. A custom bufferQueue can be specified
+    // if behavior for queue/dequeue/connect etc needs to be customized.
+    // Otherwise a default BufferQueue will be created and used.
+    //
+    // For legacy reasons, the GLConsumer is created in a state where it is
+    // considered attached to an OpenGL ES context for the purposes of the
+    // attachToContext and detachFromContext methods. However, despite being
+    // considered "attached" to a context, the specific OpenGL ES context
+    // doesn't get latched until the first call to updateTexImage. After that
+    // point, all calls to updateTexImage must be made with the same OpenGL ES
+    // context current.
     //
     // A GLConsumer may be detached from one OpenGL ES context and then
     // attached to a different context using the detachFromContext and
@@ -71,24 +81,9 @@ public:
     // purely to allow a GLConsumer to be transferred from one consumer
     // context to another. If such a transfer is not needed there is no
     // requirement that either of these methods be called.
-    //
-    // If the constructor with the tex parameter is used, the GLConsumer is
-    // created in a state where it is considered attached to an OpenGL ES
-    // context for the purposes of the attachToContext and detachFromContext
-    // methods. However, despite being considered "attached" to a context, the
-    // specific OpenGL ES context doesn't get latched until the first call to
-    // updateTexImage. After that point, all calls to updateTexImage must be
-    // made with the same OpenGL ES context current.
-    //
-    // If the constructor without the tex parameter is used, the GLConsumer is
-    // created in a detached state, and attachToContext must be called before
-    // calls to updateTexImage.
     GLConsumer(const sp<IGraphicBufferConsumer>& bq,
             uint32_t tex, uint32_t texureTarget = TEXTURE_EXTERNAL,
             bool useFenceSync = true, bool isControlledByApp = false);
-
-    GLConsumer(const sp<IGraphicBufferConsumer>& bq, uint32_t texureTarget,
-            bool useFenceSync, bool isControlledByApp);
 
     // updateTexImage acquires the most recently queued buffer, and sets the
     // image contents of the target texture to it.
