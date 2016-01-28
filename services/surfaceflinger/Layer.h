@@ -38,9 +38,9 @@
 
 #include "FrameTracker.h"
 #include "Client.h"
-#include "MonitoredProducer.h"
 #include "SurfaceFlinger.h"
 #include "SurfaceFlingerConsumer.h"
+#include "SurfaceTextureLayer.h"
 #include "Transform.h"
 
 #include "DisplayHardware/HWComposer.h"
@@ -141,7 +141,7 @@ public:
     Rect computeBounds() const;
 
     sp<IBinder> getHandle();
-    sp<IGraphicBufferProducer> getProducer() const;
+    sp<IGraphicBufferProducer> getBufferQueue() const;
     const String8& getName() const;
 
     // -----------------------------------------------------------------------
@@ -340,7 +340,7 @@ private:
 
     // constants
     sp<SurfaceFlingerConsumer> mSurfaceFlingerConsumer;
-    sp<IGraphicBufferProducer> mProducer;
+    sp<BufferQueue> mBufferQueue;
     uint32_t mTextureName;
     bool mPremultipliedAlpha;
     String8 mName;

@@ -31,9 +31,8 @@ public:
         virtual void onSidebandStreamChanged() = 0;
     };
 
-    SurfaceFlingerConsumer(const sp<IGraphicBufferConsumer>& consumer,
-            uint32_t tex)
-        : GLConsumer(consumer, tex, GLConsumer::TEXTURE_EXTERNAL, false)
+    SurfaceFlingerConsumer(const sp<BufferQueue>& bq, uint32_t tex)
+        : GLConsumer(bq, tex, GLConsumer::TEXTURE_EXTERNAL, false)
     {}
 
     class BufferRejecter {

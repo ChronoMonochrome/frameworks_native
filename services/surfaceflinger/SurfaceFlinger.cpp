@@ -419,17 +419,12 @@ void SurfaceFlinger::init() {
             createBuiltinDisplayLocked(type);
             wp<IBinder> token = mBuiltinDisplays[i];
 
-            sp<IGraphicBufferProducer> producer;
-            sp<IGraphicBufferConsumer> consumer;
-            BufferQueue::createBufferQueue(&producer, &consumer,
-                    new GraphicBufferAlloc());
-
-            sp<FramebufferSurface> fbs = new FramebufferSurface(*mHwc, i,
-                    consumer);
+            sp<BufferQueue> bq = new BufferQueue(new GraphicBufferAlloc());
+            sp<FramebufferSurface> fbs = new FramebufferSurface(*mHwc, i, bq);
             int32_t hwcId = allocateHwcDisplayId(type);
             sp<DisplayDevice> hw = new DisplayDevice(this,
                     type, hwcId, mHwc->getFormat(hwcId), isSecure, token,
-                    fbs, producer,
+                    fbs, bq,
                     mRenderEngine->getEGLConfig());
             if (i > DisplayDevice::DISPLAY_PRIMARY) {
                 // FIXME: currently we don't get blank/unblank requests
@@ -1312,10 +1307,7 @@ void SurfaceFlinger::handleTransactionLocked(uint32_t transactionFlags)
 
                     sp<DisplaySurface> dispSurface;
                     sp<IGraphicBufferProducer> producer;
-                    sp<IGraphicBufferProducer> bqProducer;
-                    sp<IGraphicBufferConsumer> bqConsumer;
-                    BufferQueue::createBufferQueue(&bqProducer, &bqConsumer,
-                            new GraphicBufferAlloc());
+                    sp<BufferQueue> bq = new BufferQueue(new GraphicBufferAlloc());
 
                     int32_t hwcDisplayId = -1;
                     if (state.isVirtualDisplay()) {
@@ -1326,8 +1318,8 @@ void SurfaceFlinger::handleTransactionLocked(uint32_t transactionFlags)
 
                             hwcDisplayId = allocateHwcDisplayId(state.type);
                             sp<VirtualDisplaySurface> vds = new VirtualDisplaySurface(
-                                    *mHwc, hwcDisplayId, state.surface,
-                                    bqProducer, bqConsumer, state.displayName);
+                                    *mHwc, hwcDisplayId, state.surface, bq,
+                                    state.displayName);
 
                             dispSurface = vds;
                             producer = vds;
@@ -1340,9 +1332,8 @@ void SurfaceFlinger::handleTransactionLocked(uint32_t transactionFlags)
                         hwcDisplayId = allocateHwcDisplayId(state.type);
                         // for supported (by hwc) displays we provide our
                         // own rendering surface
-                        dispSurface = new FramebufferSurface(*mHwc, state.type,
-                                bqConsumer);
-                        producer = bqProducer;
+                        dispSurface = new FramebufferSurface(*mHwc, state.type, bq);
+                        producer = bq;
                     }
 
                     const wp<IBinder>& display(curr.keyAt(i));
@@ -2142,7 +2133,7 @@ status_t SurfaceFlinger::createNormalLayer(const sp<Client>& client,
     status_t err = (*outLayer)->setBuffers(w, h, format, flags);
     if (err == NO_ERROR) {
         *handle = (*outLayer)->getHandle();
-        *gbp = (*outLayer)->getProducer();
+        *gbp = (*outLayer)->getBufferQueue();
     }
 
     ALOGE_IF(err, "createNormalLayer() failed (%s)", strerror(-err));
@@ -2155,7 +2146,7 @@ status_t SurfaceFlinger::createDimLayer(const sp<Client>& client,
 {
     *outLayer = new LayerDim(this, client, name, w, h, flags);
     *handle = (*outLayer)->getHandle();
-    *gbp = (*outLayer)->getProducer();
+    *gbp = (*outLayer)->getBufferQueue();
     return NO_ERROR;
 }
 

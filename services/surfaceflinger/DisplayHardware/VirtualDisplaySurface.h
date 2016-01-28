@@ -73,8 +73,7 @@ class VirtualDisplaySurface : public DisplaySurface,
 public:
     VirtualDisplaySurface(HWComposer& hwc, int32_t dispId,
             const sp<IGraphicBufferProducer>& sink,
-            const sp<IGraphicBufferProducer>& bqProducer,
-            const sp<IGraphicBufferConsumer>& bqConsumer,
+            const sp<BufferQueue>& bq,
             const String8& name);
 
     //

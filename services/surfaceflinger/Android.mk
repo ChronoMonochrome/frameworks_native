@@ -14,9 +14,9 @@ LOCAL_SRC_FILES:= \
     Layer.cpp \
     LayerDim.cpp \
     MessageQueue.cpp \
-    MonitoredProducer.cpp \
     SurfaceFlinger.cpp \
     SurfaceFlingerConsumer.cpp \
+    SurfaceTextureLayer.cpp \
     Transform.cpp \
     DisplayHardware/FramebufferSurface.cpp \
     DisplayHardware/HWComposer.cpp \
