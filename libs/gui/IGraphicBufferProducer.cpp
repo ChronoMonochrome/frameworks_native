@@ -18,10 +18,9 @@
 #include <sys/types.h>
 
 #include <utils/Errors.h>
-#include <utils/NativeHandle.h>
 #include <utils/RefBase.h>
-#include <utils/Timers.h>
 #include <utils/Vector.h>
+#include <utils/Timers.h>
 
 #include <binder/Parcel.h>
 #include <binder/IInterface.h>
@@ -40,7 +39,6 @@ enum {
     QUERY,
     CONNECT,
     DISCONNECT,
-    SET_SIDEBAND_STREAM,
 };
 
 class BpGraphicBufferProducer : public BpInterface<IGraphicBufferProducer>
@@ -171,22 +169,6 @@ public:
         result = reply.readInt32();
         return result;
     }
-
-    virtual status_t setSidebandStream(const sp<NativeHandle>& stream) {
-        Parcel data, reply;
-        status_t result;
-        data.writeInterfaceToken(IGraphicBufferProducer::getInterfaceDescriptor());
-        if (stream.get()) {
-            data.writeInt32(true);
-            data.writeNativeHandle(stream->handle());
-        } else {
-            data.writeInt32(false);
-        }
-        if ((result = remote()->transact(SET_SIDEBAND_STREAM, data, &reply)) == NO_ERROR) {
-            result = reply.readInt32();
-        }
-        return result;
-    }
 };
 
 IMPLEMENT_META_INTERFACE(GraphicBufferProducer, "android.gui.IGraphicBufferProducer");
@@ -279,16 +261,6 @@ status_t BnGraphicBufferProducer::onTransact(
             int api = data.readInt32();
             status_t res = disconnect(api);
             reply->writeInt32(res);
-            return NO_ERROR;
-        } break;
-        case SET_SIDEBAND_STREAM: {
-            CHECK_INTERFACE(IGraphicBufferProducer, data, reply);
-            sp<NativeHandle> stream;
-            if (data.readInt32()) {
-                stream = NativeHandle::create(data.readNativeHandle());
-            }
-            status_t result = setSidebandStream(stream);
-            reply->writeInt32(result);
             return NO_ERROR;
         } break;
     }

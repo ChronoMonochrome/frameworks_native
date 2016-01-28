@@ -24,7 +24,6 @@
 #include <sys/types.h>
 
 #include <utils/Errors.h>
-#include <utils/NativeHandle.h>
 
 #include <binder/Parcel.h>
 #include <binder/IInterface.h>
@@ -196,7 +195,6 @@ enum {
     SET_DEFAULT_BUFFER_FORMAT,
     SET_CONSUMER_USAGE_BITS,
     SET_TRANSFORM_HINT,
-    GET_SIDEBAND_STREAM,
     DUMP,
 };
 
@@ -354,20 +352,6 @@ public:
             return result;
         }
         return reply.readInt32();
-    }
-
-    virtual sp<NativeHandle> getSidebandStream() const {
-        Parcel data, reply;
-        status_t err;
-        data.writeInterfaceToken(IGraphicBufferConsumer::getInterfaceDescriptor());
-        if ((err = remote()->transact(GET_SIDEBAND_STREAM, data, &reply)) != NO_ERROR) {
-            return NULL;
-        }
-        sp<NativeHandle> stream;
-        if (reply.readInt32()) {
-            stream = NativeHandle::create(reply.readNativeHandle());
-        }
-        return stream;
     }
 
     virtual void dump(String8& result, const char* prefix) const {

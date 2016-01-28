@@ -22,7 +22,6 @@
 
 #include <utils/Condition.h>
 #include <utils/Mutex.h>
-#include <utils/NativeHandle.h>
 #include <utils/RefBase.h>
 #include <utils/String8.h>
 #include <utils/StrongPointer.h>
@@ -230,9 +229,6 @@ private:
 
     // mTransformHint is used to optimize for screen rotations.
     uint32_t mTransformHint;
-
-    // mSidebandStream is a handle to the sideband buffer stream, if any
-    sp<NativeHandle> mSidebandStream;
 
 }; // class BufferQueueCore
 

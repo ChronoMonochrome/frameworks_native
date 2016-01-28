@@ -132,9 +132,6 @@ void ConsumerBase::onBuffersReleased() {
     }
 }
 
-void ConsumerBase::onSidebandStreamChanged() {
-}
-
 void ConsumerBase::abandon() {
     CB_LOGV("abandon");
     Mutex::Autolock lock(mMutex);

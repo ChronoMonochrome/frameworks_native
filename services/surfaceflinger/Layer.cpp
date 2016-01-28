@@ -27,7 +27,6 @@
 
 #include <utils/Errors.h>
 #include <utils/Log.h>
-#include <utils/NativeHandle.h>
 #include <utils/StopWatch.h>
 #include <utils/Trace.h>
 
@@ -67,7 +66,6 @@ Layer::Layer(SurfaceFlinger* flinger, const sp<Client>& client,
         mFormat(PIXEL_FORMAT_NONE),
         mTransactionFlags(0),
         mQueuedFrames(0),
-        mSidebandStreamChanged(false),
         mCurrentTransform(0),
         mCurrentScalingMode(NATIVE_WINDOW_SCALING_MODE_FREEZE),
         mCurrentOpacity(true),
@@ -120,7 +118,7 @@ void Layer::onFirstRef() {
     mBufferQueue = new SurfaceTextureLayer(mFlinger);
     mSurfaceFlingerConsumer = new SurfaceFlingerConsumer(mBufferQueue, mTextureName);
     mSurfaceFlingerConsumer->setConsumerUsageBits(getEffectiveUsage(0));
-    mSurfaceFlingerConsumer->setContentsChangedListener(this);
+    mSurfaceFlingerConsumer->setFrameAvailableListener(this);
     mSurfaceFlingerConsumer->setName(mName);
 
 #ifdef TARGET_DISABLE_TRIPLE_BUFFERING
@@ -158,13 +156,6 @@ void Layer::onLayerDisplayed(const sp<const DisplayDevice>& /* hw */,
 void Layer::onFrameAvailable() {
     android_atomic_inc(&mQueuedFrames);
     mFlinger->signalLayerUpdate();
-}
-
-void Layer::onSidebandStreamChanged() {
-    if (android_atomic_release_cas(false, true, &mSidebandStreamChanged) == 0) {
-        // mSidebandStreamChanged was false
-        mFlinger->signalLayerUpdate();
-    }
 }
 
 // called with SurfaceFlinger::mStateLock from the drawing thread after
@@ -422,13 +413,9 @@ void Layer::setPerFrameData(const sp<const DisplayDevice>& hw,
     Region visible = tr.transform(visibleRegion.intersect(hw->getViewport()));
     layer.setVisibleRegionScreen(visible);
 
-    if (mSidebandStream.get()) {
-        layer.setSidebandStream(mSidebandStream);
-    } else {
-        // NOTE: buffer can be NULL if the client never drew into this
-        // layer yet, or if we ran out of memory
-        layer.setBuffer(mActiveBuffer);
-    }
+    // NOTE: buffer can be NULL if the client never drew into this
+    // layer yet, or if we ran out of memory
+    layer.setBuffer(mActiveBuffer);
 }
 
 void Layer::setAcquireFence(const sp<const DisplayDevice>& /* hw */,
@@ -920,7 +907,7 @@ bool Layer::setLayerStack(uint32_t layerStack) {
 
 bool Layer::onPreComposition() {
     mRefreshPending = false;
-    return mQueuedFrames > 0 || mSidebandStreamChanged;
+    return mQueuedFrames > 0;
 }
 
 void Layer::onPostComposition() {
@@ -962,11 +949,6 @@ bool Layer::isVisible() const {
 Region Layer::latchBuffer(bool& recomputeVisibleRegions)
 {
     ATRACE_CALL();
-
-    if (android_atomic_acquire_cas(true, false, &mSidebandStreamChanged) == 0) {
-        // mSidebandStreamChanged was true
-        mSidebandStream = mSurfaceFlingerConsumer->getSidebandStream();
-    }
 
     Region outDirtyRegion;
     if (mQueuedFrames > 0) {

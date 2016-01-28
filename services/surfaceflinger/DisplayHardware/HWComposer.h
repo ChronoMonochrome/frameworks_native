@@ -45,10 +45,9 @@ struct framebuffer_device_t;
 namespace android {
 // ---------------------------------------------------------------------------
 
+class GraphicBuffer;
 class Fence;
 class FloatRect;
-class GraphicBuffer;
-class NativeHandle;
 class Region;
 class String8;
 class SurfaceFlinger;
@@ -165,7 +164,6 @@ public:
         virtual void setFrame(const Rect& frame) = 0;
         virtual void setCrop(const FloatRect& crop) = 0;
         virtual void setVisibleRegionScreen(const Region& reg) = 0;
-        virtual void setSidebandStream(const sp<NativeHandle>& stream) = 0;
         virtual void setBuffer(const sp<GraphicBuffer>& buffer) = 0;
         virtual void setAcquireFenceFd(int fenceFd) = 0;
         virtual void setPlaneAlpha(uint8_t alpha) = 0;
