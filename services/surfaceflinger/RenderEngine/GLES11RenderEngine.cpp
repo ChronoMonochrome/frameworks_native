@@ -17,8 +17,6 @@
 #include <GLES/gl.h>
 #include <GLES/glext.h>
 
-#include <ui/Rect.h>
-
 #include <utils/String8.h>
 #include <cutils/compiler.h>
 
@@ -74,23 +72,13 @@ size_t GLES11RenderEngine::getMaxViewportDims() const {
 }
 
 void GLES11RenderEngine::setViewportAndProjection(
-        size_t vpw, size_t vph, Rect sourceCrop, size_t hwh, bool yswap) {
+        size_t vpw, size_t vph, size_t w, size_t h, bool yswap) {
     glViewport(0, 0, vpw, vph);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-
-    size_t l = sourceCrop.left;
-    size_t r = sourceCrop.right;
-
-    // In GL, (0, 0) is the bottom-left corner, so flip y coordinates
-    size_t t = hwh - sourceCrop.top;
-    size_t b = hwh - sourceCrop.bottom;
-
-    if (yswap) {
-        glOrthof(l, r, t, b, 0, 1);
-    } else {
-        glOrthof(l, r, b, t, 0, 1);
-    }
+    // put the origin in the left-bottom corner
+    if (yswap)  glOrthof(0, w, h, 0, 0, 1);
+    else        glOrthof(0, w, 0, h, 0, 1);
     glMatrixMode(GL_MODELVIEW);
 }
 

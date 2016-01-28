@@ -180,12 +180,10 @@ private:
 class ScreenshotClient
 {
 public:
-    // if cropping isn't required, callers may pass in a default Rect, e.g.:
-    //   capture(display, producer, Rect(), reqWidth, ...);
     static status_t capture(
             const sp<IBinder>& display,
             const sp<IGraphicBufferProducer>& producer,
-            Rect sourceCrop, uint32_t reqWidth, uint32_t reqHeight,
+            uint32_t reqWidth, uint32_t reqHeight,
             uint32_t minLayerZ, uint32_t maxLayerZ,
             bool useIdentityTransform);
 
@@ -199,16 +197,13 @@ public:
     ScreenshotClient();
     ~ScreenshotClient();
 
-    // frees the previous screenshot and captures a new one
-    // if cropping isn't required, callers may pass in a default Rect, e.g.:
-    //   update(display, Rect(), useIdentityTransform);
+    // frees the previous screenshot and capture a new one
+    status_t update(const sp<IBinder>& display, bool useIdentityTransform);
     status_t update(const sp<IBinder>& display,
-            Rect sourceCrop, bool useIdentityTransform);
-    status_t update(const sp<IBinder>& display,
-            Rect sourceCrop, uint32_t reqWidth, uint32_t reqHeight,
+            uint32_t reqWidth, uint32_t reqHeight,
             bool useIdentityTransform);
     status_t update(const sp<IBinder>& display,
-            Rect sourceCrop, uint32_t reqWidth, uint32_t reqHeight,
+            uint32_t reqWidth, uint32_t reqHeight,
             uint32_t minLayerZ, uint32_t maxLayerZ,
             bool useIdentityTransform);
 

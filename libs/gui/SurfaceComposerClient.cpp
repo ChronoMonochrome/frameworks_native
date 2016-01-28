@@ -676,11 +676,11 @@ status_t SurfaceComposerClient::getAnimationFrameStats(FrameStats* outStats) {
 status_t ScreenshotClient::capture(
         const sp<IBinder>& display,
         const sp<IGraphicBufferProducer>& producer,
-        Rect sourceCrop, uint32_t reqWidth, uint32_t reqHeight,
+        uint32_t reqWidth, uint32_t reqHeight,
         uint32_t minLayerZ, uint32_t maxLayerZ, bool useIdentityTransform) {
     sp<ISurfaceComposer> s(ComposerService::getComposerService());
     if (s == NULL) return NO_INIT;
-    return s->captureScreen(display, producer, sourceCrop,
+    return s->captureScreen(display, producer,
             reqWidth, reqHeight, minLayerZ, maxLayerZ, useIdentityTransform);
 }
 
@@ -704,7 +704,7 @@ sp<CpuConsumer> ScreenshotClient::getCpuConsumer() const {
 }
 
 status_t ScreenshotClient::update(const sp<IBinder>& display,
-        Rect sourceCrop, uint32_t reqWidth, uint32_t reqHeight,
+        uint32_t reqWidth, uint32_t reqHeight,
         uint32_t minLayerZ, uint32_t maxLayerZ,
         bool useIdentityTransform) {
     sp<ISurfaceComposer> s(ComposerService::getComposerService());
@@ -717,7 +717,7 @@ status_t ScreenshotClient::update(const sp<IBinder>& display,
         mHaveBuffer = false;
     }
 
-    status_t err = s->captureScreen(display, mProducer, sourceCrop,
+    status_t err = s->captureScreen(display, mProducer,
             reqWidth, reqHeight, minLayerZ, maxLayerZ, useIdentityTransform);
 
     if (err == NO_ERROR) {
@@ -729,16 +729,16 @@ status_t ScreenshotClient::update(const sp<IBinder>& display,
     return err;
 }
 
-status_t ScreenshotClient::update(const sp<IBinder>& display, Rect sourceCrop,
+status_t ScreenshotClient::update(const sp<IBinder>& display,
         bool useIdentityTransform) {
-    return ScreenshotClient::update(display, sourceCrop, 0, 0, 0, -1UL,
+    return ScreenshotClient::update(display, 0, 0, 0, -1UL,
             useIdentityTransform);
 }
 
-status_t ScreenshotClient::update(const sp<IBinder>& display, Rect sourceCrop,
+status_t ScreenshotClient::update(const sp<IBinder>& display,
         uint32_t reqWidth, uint32_t reqHeight, bool useIdentityTransform) {
-    return ScreenshotClient::update(display, sourceCrop, reqWidth, reqHeight,
-            0, -1UL, useIdentityTransform);
+    return ScreenshotClient::update(display, reqWidth, reqHeight, 0, -1UL,
+            useIdentityTransform);
 }
 
 void ScreenshotClient::release() {
