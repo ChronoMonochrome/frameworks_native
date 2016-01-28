@@ -557,8 +557,7 @@ status_t BufferQueue::queueBuffer(int buf,
         item.mAcquireCalled = mSlots[buf].mAcquireCalled;
         item.mGraphicBuffer = mSlots[buf].mGraphicBuffer;
         item.mCrop = crop;
-        item.mTransform = transform & ~NATIVE_WINDOW_TRANSFORM_INVERSE_DISPLAY;
-        item.mTransformToDisplayInverse = bool(transform & NATIVE_WINDOW_TRANSFORM_INVERSE_DISPLAY);
+        item.mTransform = transform;
         item.mScalingMode = scalingMode;
         item.mTimestamp = timestamp;
         item.mIsAutoTimestamp = isAutoTimestamp;

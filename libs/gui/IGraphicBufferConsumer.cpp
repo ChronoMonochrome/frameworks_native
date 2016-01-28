@@ -47,8 +47,7 @@ IGraphicBufferConsumer::BufferItem::BufferItem() :
     mFrameNumber(0),
     mBuf(INVALID_BUFFER_SLOT),
     mIsDroppable(false),
-    mAcquireCalled(false),
-    mTransformToDisplayInverse(false) {
+    mAcquireCalled(false) {
     mCrop.makeInvalid();
 }
 
@@ -61,8 +60,7 @@ size_t IGraphicBufferConsumer::BufferItem::getPodSize() const {
             sizeof(mFrameNumber) +
             sizeof(mBuf) +
             sizeof(mIsDroppable) +
-            sizeof(mAcquireCalled) +
-            sizeof(mTransformToDisplayInverse);
+            sizeof(mAcquireCalled);
     return c;
 }
 
@@ -132,7 +130,6 @@ status_t IGraphicBufferConsumer::BufferItem::flatten(
     FlattenableUtils::write(buffer, size, mBuf);
     FlattenableUtils::write(buffer, size, mIsDroppable);
     FlattenableUtils::write(buffer, size, mAcquireCalled);
-    FlattenableUtils::write(buffer, size, mTransformToDisplayInverse);
 
     return NO_ERROR;
 }
@@ -174,7 +171,6 @@ status_t IGraphicBufferConsumer::BufferItem::unflatten(
     FlattenableUtils::read(buffer, size, mBuf);
     FlattenableUtils::read(buffer, size, mIsDroppable);
     FlattenableUtils::read(buffer, size, mAcquireCalled);
-    FlattenableUtils::read(buffer, size, mTransformToDisplayInverse);
 
     return NO_ERROR;
 }
