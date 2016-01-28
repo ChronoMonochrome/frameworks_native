@@ -109,7 +109,6 @@ public:
     Region                  getDirtyRegion(bool repaintEverything) const;
 
     void                    setLayerStack(uint32_t stack);
-    void                    setDisplaySize(const int newWidth, const int newHeight);
     void                    setProjection(int orientation, const Rect& viewport, const Rect& frame);
 
     int                     getOrientation() const { return mOrientation; }
@@ -185,7 +184,6 @@ private:
 #endif
     sp<DisplaySurface> mDisplaySurface;
 
-    EGLConfig       mConfig;
     EGLDisplay      mDisplay;
     EGLSurface      mSurface;
     int             mDisplayWidth;

@@ -1269,9 +1269,6 @@ void SurfaceFlinger::handleTransactionLocked(uint32_t transactionFlags)
                                         state.viewport, state.frame);
                             }
                         }
-                        if (state.width != draw[i].width || state.height != draw[i].height) {
-                            disp->setDisplaySize(state.width, state.height);
-                        }
                     }
                 }
             }
@@ -1299,7 +1296,13 @@ void SurfaceFlinger::handleTransactionLocked(uint32_t transactionFlags)
                                     state.displayName);
 
                             dispSurface = vds;
-                            producer = vds;
+                            if (hwcDisplayId >= 0) {
+                                producer = vds;
+                            } else {
+                                // There won't be any interaction with HWC for this virtual display,
+                                // so the GLES driver can pass buffers directly to the sink.
+                                producer = state.surface;
+                            }
                         }
                     } else {
                         ALOGE_IF(state.surface!=NULL,
@@ -1972,16 +1975,6 @@ uint32_t SurfaceFlinger::setDisplayStateLocked(const DisplayState& s)
                 flags |= eDisplayTransactionNeeded;
             }
         }
-        if (what & DisplayState::eDisplaySizeChanged) {
-            if (disp.width != s.width) {
-                disp.width = s.width;
-                flags |= eDisplayTransactionNeeded;
-            }
-            if (disp.height != s.height) {
-                disp.height = s.height;
-                flags |= eDisplayTransactionNeeded;
-            }
-        }
     }
     return flags;
 }
@@ -2168,8 +2161,6 @@ void SurfaceFlinger::onInitializeDisplays() {
     d.orientation = DisplayState::eOrientationDefault;
     d.frame.makeInvalid();
     d.viewport.makeInvalid();
-    d.width = 0;
-    d.height = 0;
     displays.add(d);
     setTransactionState(state, displays, 0);
     setPowerModeInternal(getDisplayDevice(d.token), HWC_POWER_MODE_NORMAL);
@@ -3249,11 +3240,11 @@ int SurfaceFlinger::LayerVector::do_compare(const void* lhs,
 // ---------------------------------------------------------------------------
 
 SurfaceFlinger::DisplayDeviceState::DisplayDeviceState()
-    : type(DisplayDevice::DISPLAY_ID_INVALID), width(0), height(0) {
+    : type(DisplayDevice::DISPLAY_ID_INVALID) {
 }
 
 SurfaceFlinger::DisplayDeviceState::DisplayDeviceState(DisplayDevice::DisplayType type)
-    : type(type), layerStack(DisplayDevice::NO_LAYER_STACK), orientation(0), width(0), height(0) {
+    : type(type), layerStack(DisplayDevice::NO_LAYER_STACK), orientation(0) {
     viewport.makeInvalid();
     frame.makeInvalid();
 }

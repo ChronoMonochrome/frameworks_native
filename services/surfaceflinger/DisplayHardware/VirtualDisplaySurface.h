@@ -85,7 +85,6 @@ public:
     virtual status_t advanceFrame();
     virtual void onFrameCommitted();
     virtual void dump(String8& result) const;
-    virtual void resizeBuffers(const uint32_t w, const uint32_t h);
 
 private:
     enum Source {SOURCE_SINK = 0, SOURCE_SCRATCH = 1};
@@ -163,10 +162,6 @@ private:
     // to the sink, we have to return the previous version.
     QueueBufferOutput mQueueBufferOutput;
 
-    // Details of the current sink buffer. These become valid when a buffer is
-    // dequeued from the sink, and are used when queueing the buffer.
-    uint32_t mSinkBufferWidth, mSinkBufferHeight;
-
     //
     // Intra-frame state
     //
@@ -174,6 +169,10 @@ private:
     // Composition type and GLES buffer source for the current frame.
     // Valid after prepareFrame(), cleared in onFrameCommitted.
     CompositionType mCompositionType;
+
+    // Details of the current sink buffer. These become valid when a buffer is
+    // dequeued from the sink, and are used when queueing the buffer.
+    uint32_t mSinkBufferWidth, mSinkBufferHeight;
 
     // mFbFence is the fence HWC should wait for before reading the framebuffer
     // target buffer.
