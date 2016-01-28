@@ -277,18 +277,15 @@ public:
         // async - if the buffer is queued in asynchronous mode
         // fence - a fence that the consumer must wait on before reading the buffer,
         //         set this to Fence::NO_FENCE if the buffer is ready immediately
-        // sticky - the sticky transform set in Surface (only used by the LEGACY
-        //          camera mode).
         inline QueueBufferInput(int64_t timestamp, bool isAutoTimestamp,
                 const Rect& crop, int scalingMode, uint32_t transform, bool async,
-                const sp<Fence>& fence, uint32_t sticky = 0)
+                const sp<Fence>& fence)
         : timestamp(timestamp), isAutoTimestamp(isAutoTimestamp), crop(crop),
-          scalingMode(scalingMode), transform(transform), stickyTransform(sticky),
-          async(async), fence(fence) { }
+          scalingMode(scalingMode), transform(transform), async(async),
+          fence(fence) { }
         inline void deflate(int64_t* outTimestamp, bool* outIsAutoTimestamp,
                 Rect* outCrop, int* outScalingMode, uint32_t* outTransform,
-                bool* outAsync, sp<Fence>* outFence,
-                uint32_t* outStickyTransform = NULL) const {
+                bool* outAsync, sp<Fence>* outFence) const {
             *outTimestamp = timestamp;
             *outIsAutoTimestamp = bool(isAutoTimestamp);
             *outCrop = crop;
@@ -296,9 +293,6 @@ public:
             *outTransform = transform;
             *outAsync = bool(async);
             *outFence = fence;
-            if (outStickyTransform != NULL) {
-                *outStickyTransform = stickyTransform;
-            }
         }
 
         // Flattenable protocol
@@ -313,7 +307,6 @@ public:
         Rect crop;
         int scalingMode;
         uint32_t transform;
-        uint32_t stickyTransform;
         int async;
         sp<Fence> fence;
     };

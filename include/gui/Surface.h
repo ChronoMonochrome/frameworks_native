@@ -138,7 +138,6 @@ private:
     int dispatchSetBuffersFormat(va_list args);
     int dispatchSetScalingMode(va_list args);
     int dispatchSetBuffersTransform(va_list args);
-    int dispatchSetBuffersStickyTransform(va_list args);
     int dispatchSetBuffersTimestamp(va_list args);
     int dispatchSetCrop(va_list args);
     int dispatchSetPostTransformCrop(va_list args);
@@ -165,7 +164,6 @@ protected:
     virtual int setBuffersFormat(int format);
     virtual int setScalingMode(int mode);
     virtual int setBuffersTransform(int transform);
-    virtual int setBuffersStickyTransform(int transform);
     virtual int setBuffersTimestamp(int64_t timestamp);
     virtual int setCrop(Rect const* rect);
     virtual int setUsage(uint32_t reqUsage);
@@ -233,12 +231,6 @@ private:
     // mTransform is the transform identifier that will be used for the next
     // buffer that gets queued. It is set by calling setTransform.
     uint32_t mTransform;
-
-    // mStickyTransform is a transform that is applied on top of mTransform
-    // in each buffer that is queued.  This is typically used to force the
-    // compositor to apply a transform, and will prevent the transform hint
-    // from being set by the compositor.
-    uint32_t mStickyTransform;
 
      // mDefaultWidth is default width of the buffers, regardless of the
      // native_window_set_buffers_dimensions call.

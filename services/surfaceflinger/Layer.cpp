@@ -686,17 +686,6 @@ void Layer::drawWithOpenGL(const sp<const DisplayDevice>& hw,
     engine.disableBlending();
 }
 
-uint32_t Layer::getProducerStickyTransform() const {
-    int producerStickyTransform = 0;
-    int ret = mProducer->query(NATIVE_WINDOW_STICKY_TRANSFORM, &producerStickyTransform);
-    if (ret != OK) {
-        ALOGW("%s: Error %s (%d) while querying window sticky transform.", __FUNCTION__,
-                strerror(-ret), ret);
-        return 0;
-    }
-    return static_cast<uint32_t>(producerStickyTransform);
-}
-
 void Layer::setFiltering(bool filtering) {
     mFiltering = filtering;
 }
@@ -1069,12 +1058,10 @@ Region Layer::latchBuffer(bool& recomputeVisibleRegions)
             Layer::State& front;
             Layer::State& current;
             bool& recomputeVisibleRegions;
-            bool stickyTransformSet;
             Reject(Layer::State& front, Layer::State& current,
-                    bool& recomputeVisibleRegions, bool stickySet)
+                    bool& recomputeVisibleRegions)
                 : front(front), current(current),
-                  recomputeVisibleRegions(recomputeVisibleRegions),
-                  stickyTransformSet(stickySet) {
+                  recomputeVisibleRegions(recomputeVisibleRegions) {
             }
 
             virtual bool reject(const sp<GraphicBuffer>& buf,
@@ -1137,12 +1124,12 @@ Region Layer::latchBuffer(bool& recomputeVisibleRegions)
                             front.requested.crop.getHeight());
                 }
 
-                if (!isFixedSize && !stickyTransformSet) {
+                if (!isFixedSize) {
                     if (front.active.w != bufWidth ||
                         front.active.h != bufHeight) {
                         // reject this buffer
-                        ALOGE("rejecting buffer: bufWidth=%d, bufHeight=%d, front.active.{w=%d, h=%d}",
-                                bufWidth, bufHeight, front.active.w, front.active.h);
+                        //ALOGD("rejecting buffer: bufWidth=%d, bufHeight=%d, front.active.{w=%d, h=%d}",
+                        //        bufWidth, bufHeight, front.active.w, front.active.h);
                         return true;
                     }
                 }
@@ -1171,8 +1158,8 @@ Region Layer::latchBuffer(bool& recomputeVisibleRegions)
             }
         };
 
-        Reject r(mDrawingState, getCurrentState(), recomputeVisibleRegions,
-                getProducerStickyTransform() != 0);
+
+        Reject r(mDrawingState, getCurrentState(), recomputeVisibleRegions);
 
         status_t updateResult = mSurfaceFlingerConsumer->updateTexImage(&r,
                 mFlinger->mPrimaryDispSync);

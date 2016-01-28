@@ -37,8 +37,7 @@ namespace android {
 BufferQueueProducer::BufferQueueProducer(const sp<BufferQueueCore>& core) :
     mCore(core),
     mSlots(core->mSlots),
-    mConsumerName(),
-    mStickyTransform(0) {}
+    mConsumerName() {}
 
 BufferQueueProducer::~BufferQueueProducer() {}
 
@@ -512,11 +511,10 @@ status_t BufferQueueProducer::queueBuffer(int slot,
     Rect crop;
     int scalingMode;
     uint32_t transform;
-    uint32_t stickyTransform;
     bool async;
     sp<Fence> fence;
     input.deflate(&timestamp, &isAutoTimestamp, &crop, &scalingMode, &transform,
-            &async, &fence, &stickyTransform);
+            &async, &fence);
 
     if (fence == NULL) {
         BQ_LOGE("queueBuffer: fence is NULL");
@@ -604,8 +602,6 @@ status_t BufferQueueProducer::queueBuffer(int slot,
         item.mSlot = slot;
         item.mFence = fence;
         item.mIsDroppable = mCore->mDequeueBufferCannotBlock || async;
-
-        mStickyTransform = stickyTransform;
 
         if (mCore->mQueue.empty()) {
             // When the queue is empty, we can ignore mDequeueBufferCannotBlock
@@ -706,9 +702,6 @@ int BufferQueueProducer::query(int what, int *outValue) {
             break;
         case NATIVE_WINDOW_MIN_UNDEQUEUED_BUFFERS:
             value = mCore->getMinUndequeuedBufferCountLocked(false);
-            break;
-        case NATIVE_WINDOW_STICKY_TRANSFORM:
-            value = static_cast<int>(mStickyTransform);
             break;
         case NATIVE_WINDOW_CONSUMER_RUNNING_BEHIND:
             value = (mCore->mQueue.size() > 1);

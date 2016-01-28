@@ -348,9 +348,6 @@ private:
     void drawWithOpenGL(const sp<const DisplayDevice>& hw, const Region& clip,
             bool useIdentityTransform) const;
 
-    // Temporary - Used only for LEGACY camera mode.
-    uint32_t getProducerStickyTransform() const;
-
 
     // -----------------------------------------------------------------------
 
