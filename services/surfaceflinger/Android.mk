@@ -86,8 +86,7 @@ LOCAL_SHARED_LIBRARIES := \
 	libGLESv2 \
 	libbinder \
 	libui \
-	libgui \
-	libpowermanager
+	libgui
 
 LOCAL_MODULE:= libsurfaceflinger
 
