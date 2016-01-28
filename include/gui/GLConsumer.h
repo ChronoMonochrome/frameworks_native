@@ -57,8 +57,9 @@ class String8;
  * This class was previously called SurfaceTexture.
  */
 class GLConsumer : public ConsumerBase {
-public:
+protected:
     enum { TEXTURE_EXTERNAL = 0x8D65 }; // GL_TEXTURE_EXTERNAL_OES
+public:
     typedef ConsumerBase::FrameAvailableListener FrameAvailableListener;
 
     // GLConsumer constructs a new GLConsumer object. If the constructor with
@@ -88,8 +89,8 @@ public:
     // created in a detached state, and attachToContext must be called before
     // calls to updateTexImage.
     GLConsumer(const sp<IGraphicBufferConsumer>& bq,
-            uint32_t tex, uint32_t texureTarget, bool useFenceSync,
-            bool isControlledByApp);
+            uint32_t tex, uint32_t texureTarget = TEXTURE_EXTERNAL,
+            bool useFenceSync = true, bool isControlledByApp = false);
 
     GLConsumer(const sp<IGraphicBufferConsumer>& bq, uint32_t texureTarget,
             bool useFenceSync, bool isControlledByApp);

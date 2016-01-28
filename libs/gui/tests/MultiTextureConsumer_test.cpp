@@ -37,8 +37,7 @@ protected:
         sp<IGraphicBufferProducer> producer;
         sp<IGraphicBufferConsumer> consumer;
         BufferQueue::createBufferQueue(&producer, &consumer);
-        mGlConsumer = new GLConsumer(consumer, TEX_ID,
-                GLConsumer::TEXTURE_EXTERNAL, true, false);
+        mGlConsumer = new GLConsumer(consumer, TEX_ID);
         mSurface = new Surface(producer);
         mANW = mSurface.get();
 
