@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#include <inttypes.h>
 #include <stdint.h>
 #include <sys/types.h>
 #include <sys/limits.h>
@@ -68,8 +67,7 @@ Sensor::Sensor(struct sensor_t const* hwSensor, int halVersion)
         if (hwSensor->maxDelay > INT_MAX) {
             // Max delay is declared as a 64 bit integer for 64 bit architectures. But it should
             // always fit in a 32 bit integer, log error and cap it to INT_MAX.
-            ALOGE("Sensor maxDelay overflow error %s %" PRId64, mName.string(),
-                  static_cast<int64_t>(hwSensor->maxDelay));
+            ALOGE("Sensor maxDelay overflow error %s %lld", mName.string(), hwSensor->maxDelay);
             mMaxDelay = INT_MAX;
         } else {
             mMaxDelay = (int32_t) hwSensor->maxDelay;
