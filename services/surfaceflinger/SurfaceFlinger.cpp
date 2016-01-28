@@ -656,16 +656,10 @@ status_t SurfaceFlinger::setActiveConfig(const sp<IBinder>& display, int mode) {
                                int mode) :
             mFlinger(flinger), mDisplay(disp) { mMode = mode; }
         virtual bool handler() {
-            Vector<DisplayInfo> configs;
-            mFlinger.getDisplayConfigs(mDisplay, &configs);
-            if(mMode < 0 || mMode >= configs.size()) {
-                ALOGE("Attempt to set active config = %d for display with %zu configs",
-                        mMode, configs.size());
-            }
             sp<DisplayDevice> hw(mFlinger.getDisplayDevice(mDisplay));
             if (hw == NULL) {
                 ALOGE("Attempt to set active config = %d for null display %p",
-                        mMode, mDisplay.get());
+                        mDisplay.get(), mMode);
             } else if (hw->getDisplayType() >= DisplayDevice::DISPLAY_VIRTUAL) {
                 ALOGW("Attempt to set active config = %d for virtual display",
                         mMode);
@@ -2241,7 +2235,7 @@ void SurfaceFlinger::setPowerMode(const sp<IBinder>& display, int mode) {
             sp<DisplayDevice> hw(mFlinger.getDisplayDevice(mDisplay));
             if (hw == NULL) {
                 ALOGE("Attempt to set power mode = %d for null display %p",
-                        mMode, mDisplay.get());
+                        mDisplay.get(), mMode);
             } else if (hw->getDisplayType() >= DisplayDevice::DISPLAY_VIRTUAL) {
                 ALOGW("Attempt to set power mode = %d for virtual display",
                         mMode);
