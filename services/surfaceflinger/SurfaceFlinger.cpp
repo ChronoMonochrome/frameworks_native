@@ -2530,7 +2530,7 @@ bool SurfaceFlinger::startDdmConnection()
     }
     void (*DdmConnection_start)(const char* name);
     DdmConnection_start =
-            (decltype(DdmConnection_start))dlsym(libddmconnection_dso, "DdmConnection_start");
+            (typeof DdmConnection_start)dlsym(libddmconnection_dso, "DdmConnection_start");
     if (!DdmConnection_start) {
         dlclose(libddmconnection_dso);
         return false;
