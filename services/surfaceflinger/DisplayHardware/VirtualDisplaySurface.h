@@ -27,7 +27,6 @@ namespace android {
 // ---------------------------------------------------------------------------
 
 class HWComposer;
-class IProducerListener;
 
 /* This DisplaySurface implementation supports virtual displays, where GLES
  * and/or HWC compose into a buffer that is then passed to an arbitrary
@@ -107,7 +106,7 @@ private:
             const QueueBufferInput& input, QueueBufferOutput* output);
     virtual void cancelBuffer(int pslot, const sp<Fence>& fence);
     virtual int query(int what, int* value);
-    virtual status_t connect(const sp<IProducerListener>& listener,
+    virtual status_t connect(const sp<IBinder>& token,
             int api, bool producerControlledByApp, QueueBufferOutput* output);
     virtual status_t disconnect(int api);
     virtual status_t setSidebandStream(const sp<NativeHandle>& stream);
