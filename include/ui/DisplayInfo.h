@@ -40,6 +40,7 @@ struct DisplayInfo {
     // needed only by old blobs
     PixelFormatInfo pixelFormatInfo;
 #endif
+    uint8_t reserved[2];
 };
 
 /* Display orientations as defined in Surface.java and ISurfaceComposer.h. */

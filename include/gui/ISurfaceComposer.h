@@ -113,18 +113,9 @@ public:
      */
     virtual void unblank(const sp<IBinder>& display) = 0;
 
-    /* returns information for each configuration of the given display
+    /* returns information about a display
      * intended to be used to get information about built-in displays */
-    virtual status_t getDisplayConfigs(const sp<IBinder>& display,
-            Vector<DisplayInfo>* configs) = 0;
-
-    /* indicates which of the configurations returned by getDisplayInfo is
-     * currently active */
-    virtual int getActiveConfig(const sp<IBinder>& display) = 0;
-
-    /* specifies which configuration (of those returned by getDisplayInfo)
-     * should be used */
-    virtual status_t setActiveConfig(const sp<IBinder>& display, int id) = 0;
+    virtual status_t getDisplayInfo(const sp<IBinder>& display, DisplayInfo* info) = 0;
 
     /* Capture the specified screen. requires READ_FRAME_BUFFER permission
      * This function will fail if there is a secure window on screen.
@@ -166,9 +157,7 @@ public:
         AUTHENTICATE_SURFACE,
         BLANK,
         UNBLANK,
-        GET_DISPLAY_CONFIGS,
-        GET_ACTIVE_CONFIG,
-        SET_ACTIVE_CONFIG,
+        GET_DISPLAY_INFO,
         CONNECT_DISPLAY,
         CAPTURE_SCREEN,
         CLEAR_ANIMATION_FRAME_STATS,

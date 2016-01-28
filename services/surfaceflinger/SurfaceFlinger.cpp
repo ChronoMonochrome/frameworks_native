@@ -497,12 +497,7 @@ bool SurfaceFlinger::authenticateSurfaceTexture(
     return mGraphicBufferProducerList.indexOf(surfaceTextureBinder) >= 0;
 }
 
-status_t SurfaceFlinger::getDisplayConfigs(const sp<IBinder>& display,
-        Vector<DisplayInfo>* configs) {
-    if (configs == NULL) {
-        return BAD_VALUE;
-    }
-
+status_t SurfaceFlinger::getDisplayInfo(const sp<IBinder>& display, DisplayInfo* info) {
     int32_t type = NAME_NOT_FOUND;
     for (int i=0 ; i<DisplayDevice::NUM_BUILTIN_DISPLAY_TYPES ; i++) {
         if (display == mBuiltinDisplays[i]) {
@@ -514,6 +509,10 @@ status_t SurfaceFlinger::getDisplayConfigs(const sp<IBinder>& display,
     if (type < 0) {
         return type;
     }
+
+    const HWComposer& hwc(getHwComposer());
+    float xdpi = hwc.getDpiX(type);
+    float ydpi = hwc.getDpiY(type);
 
     // TODO: Not sure if display density should handled by SF any longer
     class Density {
@@ -532,79 +531,41 @@ status_t SurfaceFlinger::getDisplayConfigs(const sp<IBinder>& display,
             return getDensityFromProperty("ro.sf.lcd_density"); }
     };
 
-    configs->clear();
-
-    const Vector<HWComposer::DisplayConfig>& hwConfigs =
-            getHwComposer().getConfigs(type);
-    for (size_t c = 0; c < hwConfigs.size(); ++c) {
-        const HWComposer::DisplayConfig& hwConfig = hwConfigs[c];
-        DisplayInfo info = DisplayInfo();
-
-        float xdpi = hwConfig.xdpi;
-        float ydpi = hwConfig.ydpi;
-
-        if (type == DisplayDevice::DISPLAY_PRIMARY) {
-            // The density of the device is provided by a build property
-            float density = Density::getBuildDensity() / 160.0f;
-            if (density == 0) {
-                // the build doesn't provide a density -- this is wrong!
-                // use xdpi instead
-                ALOGE("ro.sf.lcd_density must be defined as a build property");
-                density = xdpi / 160.0f;
-            }
-            if (Density::getEmuDensity()) {
-                // if "qemu.sf.lcd_density" is specified, it overrides everything
-                xdpi = ydpi = density = Density::getEmuDensity();
-                density /= 160.0f;
-            }
-            info.density = density;
-
-            // TODO: this needs to go away (currently needed only by webkit)
-            sp<const DisplayDevice> hw(getDefaultDisplayDevice());
-            info.orientation = hw->getOrientation();
-        } else {
-            // TODO: where should this value come from?
-            static const int TV_DENSITY = 213;
-            info.density = TV_DENSITY / 160.0f;
-            info.orientation = 0;
+    if (type == DisplayDevice::DISPLAY_PRIMARY) {
+        // The density of the device is provided by a build property
+        float density = Density::getBuildDensity() / 160.0f;
+        if (density == 0) {
+            // the build doesn't provide a density -- this is wrong!
+            // use xdpi instead
+            ALOGE("ro.sf.lcd_density must be defined as a build property");
+            density = xdpi / 160.0f;
         }
+        if (Density::getEmuDensity()) {
+            // if "qemu.sf.lcd_density" is specified, it overrides everything
+            xdpi = ydpi = density = Density::getEmuDensity();
+            density /= 160.0f;
+        }
+        info->density = density;
 
-        info.w = hwConfig.width;
-        info.h = hwConfig.height;
-        info.xdpi = xdpi;
-        info.ydpi = ydpi;
-        info.fps = float(1e9 / hwConfig.refresh);
-        info.appVsyncOffset = VSYNC_EVENT_PHASE_OFFSET_NS;
-
-        // This is how far in advance a buffer must be queued for
-        // presentation at a given time.  If you want a buffer to appear
-        // on the screen at time N, you must submit the buffer before
-        // (N - presentationDeadline).
-        //
-        // Normally it's one full refresh period (to give SF a chance to
-        // latch the buffer), but this can be reduced by configuring a
-        // DispSync offset.  Any additional delays introduced by the hardware
-        // composer or panel must be accounted for here.
-        //
-        // We add an additional 1ms to allow for processing time and
-        // differences between the ideal and actual refresh rate.
-        info.presentationDeadline =
-                hwConfig.refresh - SF_VSYNC_EVENT_PHASE_OFFSET_NS + 1000000;
-
-        // All non-virtual displays are currently considered secure.
-        info.secure = true;
-
-        configs->push_back(info);
+        // TODO: this needs to go away (currently needed only by webkit)
+        sp<const DisplayDevice> hw(getDefaultDisplayDevice());
+        info->orientation = hw->getOrientation();
+    } else {
+        // TODO: where should this value come from?
+        static const int TV_DENSITY = 213;
+        info->density = TV_DENSITY / 160.0f;
+        info->orientation = 0;
     }
 
-    return NO_ERROR;
-}
+    info->w = hwc.getWidth(type);
+    info->h = hwc.getHeight(type);
+    info->xdpi = xdpi;
+    info->ydpi = ydpi;
+    info->fps = float(1e9 / hwc.getRefreshPeriod(type));
 
-int SurfaceFlinger::getActiveConfig(const sp<IBinder>&) {
-    return 0;
-}
+    // All non-virtual displays are currently considered secure.
+    info->secure = true;
 
-status_t SurfaceFlinger::setActiveConfig(const sp<IBinder>&, int) {
     return NO_ERROR;
 }
 
