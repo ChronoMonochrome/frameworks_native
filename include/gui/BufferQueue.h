@@ -28,43 +28,10 @@
 #include <binder/IBinder.h>
 
 namespace android {
+// ----------------------------------------------------------------------------
 
-// BQProducer and BQConsumer are thin shim classes to allow methods with the
-// same signature in both IGraphicBufferProducer and IGraphicBufferConsumer.
-// This will stop being an issue when we deprecate creating BufferQueues
-// directly (as opposed to using the *Producer and *Consumer interfaces).
-class BQProducer : public BnGraphicBufferProducer {
-public:
-    virtual status_t detachProducerBuffer(int slot) = 0;
-    virtual status_t attachProducerBuffer(int* slot,
-            const sp<GraphicBuffer>& buffer) = 0;
-
-    virtual status_t detachBuffer(int slot) {
-        return detachProducerBuffer(slot);
-    }
-
-    virtual status_t attachBuffer(int* slot, const sp<GraphicBuffer>& buffer) {
-        return attachProducerBuffer(slot, buffer);
-    }
-};
-
-class BQConsumer : public BnGraphicBufferConsumer {
-public:
-    virtual status_t detachConsumerBuffer(int slot) = 0;
-    virtual status_t attachConsumerBuffer(int* slot,
-            const sp<GraphicBuffer>& buffer) = 0;
-
-    virtual status_t detachBuffer(int slot) {
-        return detachConsumerBuffer(slot);
-    }
-
-    virtual status_t attachBuffer(int* slot, const sp<GraphicBuffer>& buffer) {
-        return attachConsumerBuffer(slot, buffer);
-    }
-};
-
-class BufferQueue : public BQProducer,
-                    public BQConsumer,
+class BufferQueue : public BnGraphicBufferProducer,
+                    public BnGraphicBufferConsumer,
                     private IBinder::DeathRecipient {
 public:
     // BufferQueue will keep track of at most this value of buffers.
@@ -110,10 +77,6 @@ public:
         // the raison d'etre of ProxyConsumerListener.
         wp<ConsumerListener> mConsumerListener;
     };
-
-    static void createBufferQueue(sp<BnGraphicBufferProducer>* outProducer,
-            sp<BnGraphicBufferConsumer>* outConsumer,
-            const sp<IGraphicBufferAlloc>& allocator = NULL);
 
     // BufferQueue manages a pool of gralloc memory slots to be used by
     // producers and consumers. allocator is used to allocate all the
@@ -199,13 +162,6 @@ public:
     virtual status_t dequeueBuffer(int *buf, sp<Fence>* fence, bool async,
             uint32_t width, uint32_t height, uint32_t format, uint32_t usage);
 
-    // See IGraphicBufferProducer::detachBuffer
-    virtual status_t detachProducerBuffer(int slot);
-
-    // See IGraphicBufferProducer::attachBuffer
-    virtual status_t attachProducerBuffer(int* slot,
-            const sp<GraphicBuffer>& buffer);
-
     // queueBuffer returns a filled buffer to the BufferQueue.
     //
     // Additional data is provided in the QueueBufferInput struct.  Notably,
@@ -283,13 +239,6 @@ public:
     // returned.  The presentation time is in nanoseconds, and the time base
     // is CLOCK_MONOTONIC.
     virtual status_t acquireBuffer(BufferItem* buffer, nsecs_t presentWhen);
-
-    // See IGraphicBufferConsumer::detachBuffer
-    virtual status_t detachConsumerBuffer(int slot);
-
-    // See IGraphicBufferConsumer::attachBuffer
-    virtual status_t attachConsumerBuffer(int* slot,
-            const sp<GraphicBuffer>& buffer);
 
     // releaseBuffer releases a buffer slot from the consumer back to the
     // BufferQueue.  This may be done while the buffer's contents are still
