@@ -422,9 +422,8 @@ void SurfaceFlinger::init() {
 
             sp<BufferQueue> bq = new BufferQueue(new GraphicBufferAlloc());
             sp<FramebufferSurface> fbs = new FramebufferSurface(*mHwc, i, bq);
-            int32_t hwcId = allocateHwcDisplayId(type);
             sp<DisplayDevice> hw = new DisplayDevice(this,
-                    type, hwcId, mHwc->getFormat(hwcId), isSecure, token,
+                    type, allocateHwcDisplayId(type), isSecure, token,
                     fbs, bq,
                     mRenderEngine->getEGLConfig());
             if (i > DisplayDevice::DISPLAY_PRIMARY) {
@@ -1190,8 +1189,7 @@ void SurfaceFlinger::handleTransactionLocked(uint32_t transactionFlags)
                     const wp<IBinder>& display(curr.keyAt(i));
                     if (dispSurface != NULL) {
                         sp<DisplayDevice> hw = new DisplayDevice(this,
-                                state.type, hwcDisplayId,
-                                mHwc->getFormat(hwcDisplayId), state.isSecure,
+                                state.type, hwcDisplayId, state.isSecure,
                                 display, dispSurface, producer,
                                 mRenderEngine->getEGLConfig());
                         hw->setLayerStack(state.layerStack);

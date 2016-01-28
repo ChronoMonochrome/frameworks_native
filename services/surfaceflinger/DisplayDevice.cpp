@@ -56,7 +56,6 @@ DisplayDevice::DisplayDevice(
         const sp<SurfaceFlinger>& flinger,
         DisplayType type,
         int32_t hwcId,
-        int format,
         bool isSecure,
         const wp<IBinder>& displayToken,
         const sp<DisplaySurface>& displaySurface,
@@ -79,6 +78,9 @@ DisplayDevice::DisplayDevice(
 {
     ANativeWindow* const window = new FramebufferNativeWindow();
 
+    int format;
+    window->query(window, NATIVE_WINDOW_FORMAT, &format);
+
     // Make sure that composition can never be stalled by a virtual display
     // consumer that isn't processing buffers fast enough. We have to do this
     // in two places:
@@ -96,9 +98,6 @@ DisplayDevice::DisplayDevice(
     EGLSurface surface;
     EGLint w, h;
     EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    if (config == EGL_NO_CONFIG) {
-        config = RenderEngine::chooseEglConfig(display, format);
-    }
     surface = eglCreateWindowSurface(display, config, window, NULL);
     eglQuerySurface(display, surface, EGL_WIDTH,  &mDisplayWidth);
     eglQuerySurface(display, surface, EGL_HEIGHT, &mDisplayHeight);

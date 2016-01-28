@@ -456,11 +456,7 @@ uint32_t HWComposer::getHeight(int disp) const {
 }
 
 uint32_t HWComposer::getFormat(int disp) const {
-    if (uint32_t(disp)>31 || !mAllocatedDisplayIDs.hasBit(disp)) {
-        return HAL_PIXEL_FORMAT_RGBA_8888;
-    } else {
-        return mDisplayData[disp].format;
-    }
+    return mDisplayData[disp].format;
 }
 
 float HWComposer::getDpiX(int disp) const {
@@ -1152,7 +1148,7 @@ bool HWComposer::VSyncThread::threadLoop() {
 }
 
 HWComposer::DisplayData::DisplayData()
-:   width(0), height(0), format(HAL_PIXEL_FORMAT_RGBA_8888),
+:   width(0), height(0), format(0),
     xdpi(0.0f), ydpi(0.0f),
     refresh(0),
     connected(false),
