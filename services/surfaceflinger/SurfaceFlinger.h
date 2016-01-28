@@ -68,7 +68,6 @@ class Layer;
 class LayerDim;
 class Surface;
 class RenderEngine;
-class EventControlThread;
 
 // ---------------------------------------------------------------------------
 
@@ -431,7 +430,6 @@ private:
     nsecs_t mBootTime;
     bool mGpuToCpuSupported;
     sp<EventThread> mEventThread;
-    sp<EventControlThread> mEventControlThread;
     EGLContext mEGLContext;
     EGLConfig mEGLConfig;
     EGLDisplay mEGLDisplay;
@@ -485,6 +483,7 @@ private:
     bool mHasColorMatrix;
 };
 
+// ---------------------------------------------------------------------------
 }; // namespace android
 
 #endif // ANDROID_SURFACE_FLINGER_H

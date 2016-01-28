@@ -7,7 +7,6 @@ LOCAL_SRC_FILES:= \
     Client.cpp \
     DisplayDevice.cpp \
     DispSync.cpp \
-    EventControlThread.cpp \
     EventThread.cpp \
     FrameTracker.cpp \
     Layer.cpp \
