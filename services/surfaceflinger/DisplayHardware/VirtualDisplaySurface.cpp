@@ -174,8 +174,14 @@ status_t VirtualDisplaySurface::advanceFrame() {
     }
     mDbgState = DBG_STATE_HWC;
 
-    if (mOutputProducerSlot < 0 ||
-            (mCompositionType != COMPOSITION_HWC && mFbProducerSlot < 0)) {
+    if (mCompositionType == COMPOSITION_HWC) {
+        // Use the output buffer for the FB as well, though conceptually the
+        // FB is unused on this frame.
+        mFbProducerSlot = mOutputProducerSlot;
+        mFbFence = mOutputFence;
+    }
+
+    if (mFbProducerSlot < 0 || mOutputProducerSlot < 0) {
         // Last chance bailout if something bad happened earlier. For example,
         // in a GLES configuration, if the sink disappears then dequeueBuffer
         // will fail, the GLES driver won't queue a buffer, but SurfaceFlinger
@@ -185,8 +191,7 @@ status_t VirtualDisplaySurface::advanceFrame() {
         return NO_MEMORY;
     }
 
-    sp<GraphicBuffer> fbBuffer = mFbProducerSlot >= 0 ?
-            mProducerBuffers[mFbProducerSlot] : sp<GraphicBuffer>(NULL);
+    sp<GraphicBuffer> fbBuffer = mProducerBuffers[mFbProducerSlot];
     sp<GraphicBuffer> outBuffer = mProducerBuffers[mOutputProducerSlot];
     VDS_LOGV("advanceFrame: fb=%d(%p) out=%d(%p)",
             mFbProducerSlot, fbBuffer.get(),
@@ -196,12 +201,7 @@ status_t VirtualDisplaySurface::advanceFrame() {
     // so update HWC state with it.
     mHwc.setOutputBuffer(mDisplayId, mOutputFence, outBuffer);
 
-    status_t result = NO_ERROR;
-    if (fbBuffer != NULL) {
-        result = mHwc.fbPost(mDisplayId, mFbFence, fbBuffer);
-    }
-
-    return result;
+    return mHwc.fbPost(mDisplayId, mFbFence, fbBuffer);
 }
 
 void VirtualDisplaySurface::onFrameCommitted() {
@@ -464,6 +464,7 @@ void VirtualDisplaySurface::resetPerFrameState() {
     mSinkBufferHeight = 0;
     mFbFence = Fence::NO_FENCE;
     mOutputFence = Fence::NO_FENCE;
+    mFbProducerSlot = -1;
     mOutputProducerSlot = -1;
 }
 
