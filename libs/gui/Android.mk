@@ -37,7 +37,6 @@ LOCAL_SHARED_LIBRARIES := \
 	libsync \
 	libui \
 	libutils \
-	libhardware \
 	liblog
 
 
