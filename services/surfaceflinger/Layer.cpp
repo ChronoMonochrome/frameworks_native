@@ -79,8 +79,7 @@ Layer::Layer(SurfaceFlinger* flinger, const sp<Client>& client,
         mSecure(false),
         mProtectedByApp(false),
         mHasSurface(false),
-        mClientRef(client),
-        mPotentialCursor(false)
+        mClientRef(client)
 {
     mCurrentCrop.makeInvalid();
     mFlinger->getRenderEngine().genTextures(1, &mTextureName);
@@ -201,7 +200,6 @@ status_t Layer::setBuffers( uint32_t w, uint32_t h,
 
     mFormat = format;
 
-    mPotentialCursor = (flags & ISurfaceComposerClient::eCursorWindow) ? true : false;
     mSecure = (flags & ISurfaceComposerClient::eSecure) ? true : false;
     mProtectedByApp = (flags & ISurfaceComposerClient::eProtectedByApp) ? true : false;
     mCurrentOpacity = getOpacityForFormat(format);
@@ -443,7 +441,7 @@ void Layer::setAcquireFence(const sp<const DisplayDevice>& /* hw */,
     // TODO: there is a possible optimization here: we only need to set the
     // acquire fence the first time a new buffer is acquired on EACH display.
 
-    if (layer.getCompositionType() == HWC_OVERLAY || layer.getCompositionType() == HWC_CURSOR_OVERLAY) {
+    if (layer.getCompositionType() == HWC_OVERLAY) {
         sp<Fence> fence = mSurfaceFlingerConsumer->getCurrentFence();
         if (fence->isValid()) {
             fenceFd = fence->dup();
@@ -453,26 +451,6 @@ void Layer::setAcquireFence(const sp<const DisplayDevice>& /* hw */,
         }
     }
     layer.setAcquireFenceFd(fenceFd);
-}
-
-Rect Layer::getPosition(
-    const sp<const DisplayDevice>& hw)
-{
-    // this gives us only the "orientation" component of the transform
-    const State& s(getCurrentState());
-
-    // apply the layer's transform, followed by the display's global transform
-    // here we're guaranteed that the layer's transform preserves rects
-    Rect win(s.active.w, s.active.h);
-    if (!s.active.crop.isEmpty()) {
-        win.intersect(s.active.crop, &win);
-    }
-    // subtract the transparent region and snap to the bounds
-    Rect bounds = reduce(win, s.activeTransparentRegion);
-    Rect frame(s.transform.transform(bounds));
-    frame.intersect(hw->getViewport(), &frame);
-    const Transform& tr(hw->getTransform());
-    return Rect(tr.transform(frame));
 }
 
 // ---------------------------------------------------------------------------
@@ -1195,9 +1173,6 @@ uint32_t Layer::getEffectiveUsage(uint32_t usage) const
     if (mProtectedByApp) {
         // need a hardware-protected path to external video sink
         usage |= GraphicBuffer::USAGE_PROTECTED;
-    }
-    if (mPotentialCursor) {
-        usage |= GraphicBuffer::USAGE_CURSOR;
     }
     usage |= GraphicBuffer::USAGE_HW_COMPOSER;
     return usage;
