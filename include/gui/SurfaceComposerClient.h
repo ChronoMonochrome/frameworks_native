@@ -49,7 +49,7 @@ class Region;
 class SurfaceComposerClient : public RefBase
 {
     friend class Composer;
-public:
+public:    
                 SurfaceComposerClient();
     virtual     ~SurfaceComposerClient();
 
@@ -58,7 +58,7 @@ public:
 
     // Return the connection of this client
     sp<IBinder> connection() const;
-
+    
     // Forcibly remove connection before all references have gone away.
     void        dispose();
 
@@ -87,11 +87,8 @@ public:
             uint32_t flags = 0  // usage flags
     );
 
-    //! Create a virtual display
+    //! Create a display
     static sp<IBinder> createDisplay(const String8& displayName, bool secure);
-
-    //! Destroy a virtual display
-    static void destroyDisplay(const sp<IBinder>& display);
 
     //! Get the token for the existing default displays.
     //! Possible values for id are eDisplayIdMain and eDisplayIdHdmi.

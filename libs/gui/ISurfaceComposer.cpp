@@ -185,14 +185,6 @@ public:
         return reply.readStrongBinder();
     }
 
-    virtual void destroyDisplay(const sp<IBinder>& display)
-    {
-        Parcel data, reply;
-        data.writeInterfaceToken(ISurfaceComposer::getInterfaceDescriptor());
-        data.writeStrongBinder(display);
-        remote()->transact(BnSurfaceComposer::DESTROY_DISPLAY, data, &reply);
-    }
-
     virtual sp<IBinder> getBuiltInDisplay(int32_t id)
     {
         Parcel data, reply;
@@ -256,14 +248,12 @@ status_t BnSurfaceComposer::onTransact(
             CHECK_INTERFACE(ISurfaceComposer, data, reply);
             sp<IBinder> b = createConnection()->asBinder();
             reply->writeStrongBinder(b);
-            return NO_ERROR;
-        }
+        } break;
         case CREATE_GRAPHIC_BUFFER_ALLOC: {
             CHECK_INTERFACE(ISurfaceComposer, data, reply);
             sp<IBinder> b = createGraphicBufferAlloc()->asBinder();
             reply->writeStrongBinder(b);
-            return NO_ERROR;
-        }
+        } break;
         case SET_TRANSACTION_STATE: {
             CHECK_INTERFACE(ISurfaceComposer, data, reply);
             size_t count = data.readInt32();
@@ -284,13 +274,11 @@ status_t BnSurfaceComposer::onTransact(
             }
             uint32_t flags = data.readInt32();
             setTransactionState(state, displays, flags);
-            return NO_ERROR;
-        }
+        } break;
         case BOOT_FINISHED: {
             CHECK_INTERFACE(ISurfaceComposer, data, reply);
             bootFinished();
-            return NO_ERROR;
-        }
+        } break;
         case CAPTURE_SCREEN: {
             CHECK_INTERFACE(ISurfaceComposer, data, reply);
             sp<IBinder> display = data.readStrongBinder();
@@ -303,22 +291,20 @@ status_t BnSurfaceComposer::onTransact(
             status_t res = captureScreen(display, producer,
                     reqWidth, reqHeight, minLayerZ, maxLayerZ);
             reply->writeInt32(res);
-            return NO_ERROR;
-        }
+        } break;
         case AUTHENTICATE_SURFACE: {
             CHECK_INTERFACE(ISurfaceComposer, data, reply);
             sp<IGraphicBufferProducer> bufferProducer =
                     interface_cast<IGraphicBufferProducer>(data.readStrongBinder());
             int32_t result = authenticateSurfaceTexture(bufferProducer) ? 1 : 0;
             reply->writeInt32(result);
-            return NO_ERROR;
-        }
+        } break;
         case CREATE_DISPLAY_EVENT_CONNECTION: {
             CHECK_INTERFACE(ISurfaceComposer, data, reply);
             sp<IDisplayEventConnection> connection(createDisplayEventConnection());
             reply->writeStrongBinder(connection->asBinder());
             return NO_ERROR;
-        }
+        } break;
         case CREATE_DISPLAY: {
             CHECK_INTERFACE(ISurfaceComposer, data, reply);
             String8 displayName = data.readString8();
@@ -326,32 +312,24 @@ status_t BnSurfaceComposer::onTransact(
             sp<IBinder> display(createDisplay(displayName, secure));
             reply->writeStrongBinder(display);
             return NO_ERROR;
-        }
-        case DESTROY_DISPLAY: {
-            CHECK_INTERFACE(ISurfaceComposer, data, reply);
-            sp<IBinder> display = data.readStrongBinder();
-            destroyDisplay(display);
-            return NO_ERROR;
-        }
+        } break;
         case GET_BUILT_IN_DISPLAY: {
             CHECK_INTERFACE(ISurfaceComposer, data, reply);
             int32_t id = data.readInt32();
             sp<IBinder> display(getBuiltInDisplay(id));
             reply->writeStrongBinder(display);
             return NO_ERROR;
-        }
+        } break;
         case BLANK: {
             CHECK_INTERFACE(ISurfaceComposer, data, reply);
             sp<IBinder> display = data.readStrongBinder();
             blank(display);
-            return NO_ERROR;
-        }
+        } break;
         case UNBLANK: {
             CHECK_INTERFACE(ISurfaceComposer, data, reply);
             sp<IBinder> display = data.readStrongBinder();
             unblank(display);
-            return NO_ERROR;
-        }
+        } break;
         case GET_DISPLAY_INFO: {
             CHECK_INTERFACE(ISurfaceComposer, data, reply);
             DisplayInfo info;
@@ -377,9 +355,7 @@ status_t BnSurfaceComposer::onTransact(
         }
         default: {
             return BBinder::onTransact(code, data, reply, flags);
-        }
     }
-    // should be unreachable
     return NO_ERROR;
 }
 
