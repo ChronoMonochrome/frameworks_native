@@ -386,8 +386,8 @@ private:
      * VSync
      */
      void enableHardwareVsync();
-     void disableHardwareVsync(bool makeUnavailable);
-     void resyncToHardwareVsync(bool makeAvailable);
+     void disableHardwareVsync();
+     void resyncToHardwareVsync();
 
     /* ------------------------------------------------------------------------
      * Debugging & dumpsys
@@ -470,7 +470,6 @@ private:
     // protected by mHWVsyncLock
     Mutex mHWVsyncLock;
     bool mPrimaryHWVsyncEnabled;
-    bool mHWVsyncAvailable;
 
     /* ------------------------------------------------------------------------
      * Feature prototyping
