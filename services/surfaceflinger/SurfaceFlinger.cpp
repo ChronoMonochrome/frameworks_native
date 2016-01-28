@@ -2850,7 +2850,7 @@ status_t SurfaceFlinger::captureScreenImplLocked(
 
     // create a surface (because we're a producer, and we need to
     // dequeue/queue a buffer)
-    sp<Surface> sur = new Surface(producer, false);
+    sp<Surface> sur = new Surface(producer);
     ANativeWindow* window = sur.get();
 
     status_t result = NO_ERROR;
