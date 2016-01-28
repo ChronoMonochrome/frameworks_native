@@ -53,7 +53,6 @@ public:
     mutable Region swapRegion;
     // region in screen space
     Region undefinedRegion;
-    bool lastCompositionHadVisibleLayers;
 
     enum DisplayType {
         DISPLAY_ID_INVALID = -1,
