@@ -5,13 +5,8 @@ LOCAL_SRC_FILES:= \
 	IGraphicBufferConsumer.cpp \
 	IConsumerListener.cpp \
 	BitTube.cpp \
-	BufferItem.cpp \
 	BufferItemConsumer.cpp \
 	BufferQueue.cpp \
-	BufferQueueConsumer.cpp \
-	BufferQueueCore.cpp \
-	BufferQueueProducer.cpp \
-	BufferSlot.cpp \
 	ConsumerBase.cpp \
 	CpuConsumer.cpp \
 	DisplayEventReceiver.cpp \
