@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "BufferQueueProducer"
-#define ATRACE_TAG ATRACE_TAG_GRAPHICS
-//#define LOG_NDEBUG 0
-
 #define EGL_EGLEXT_PROTOTYPES
 
 #include <gui/BufferItem.h>
@@ -48,9 +44,9 @@ status_t BufferQueueProducer::requestBuffer(int slot, sp<GraphicBuffer>* buf) {
         return NO_INIT;
     }
 
-    if (slot < 0 || slot >= BufferQueueDefs::NUM_BUFFER_SLOTS) {
+    if (slot < 0 || slot >= BufferQueueCore::NUM_BUFFER_SLOTS) {
         BQ_LOGE("requestBuffer: slot index %d out of range [0, %d)",
-                slot, BufferQueueDefs::NUM_BUFFER_SLOTS);
+                slot, BufferQueueCore::NUM_BUFFER_SLOTS);
         return BAD_VALUE;
     } else if (mSlots[slot].mBufferState != BufferSlot::DEQUEUED) {
         BQ_LOGE("requestBuffer: slot %d is not owned by the producer "
@@ -76,14 +72,14 @@ status_t BufferQueueProducer::setBufferCount(int bufferCount) {
             return NO_INIT;
         }
 
-        if (bufferCount > BufferQueueDefs::NUM_BUFFER_SLOTS) {
+        if (bufferCount > BufferQueueCore::NUM_BUFFER_SLOTS) {
             BQ_LOGE("setBufferCount: bufferCount %d too large (max %d)",
-                    bufferCount, BufferQueueDefs::NUM_BUFFER_SLOTS);
+                    bufferCount, BufferQueueCore::NUM_BUFFER_SLOTS);
             return BAD_VALUE;
         }
 
         // There must be no dequeued buffers when changing the buffer count.
-        for (int s = 0; s < BufferQueueDefs::NUM_BUFFER_SLOTS; ++s) {
+        for (int s = 0; s < BufferQueueCore::NUM_BUFFER_SLOTS; ++s) {
             if (mSlots[s].mBufferState == BufferSlot::DEQUEUED) {
                 BQ_LOGE("setBufferCount: buffer owned by producer");
                 return -EINVAL;
@@ -175,7 +171,7 @@ status_t BufferQueueProducer::dequeueBuffer(int *outSlot,
             }
 
             // Free up any buffers that are in slots beyond the max buffer count
-            for (int s = maxBufferCount; s < BufferQueueDefs::NUM_BUFFER_SLOTS; ++s) {
+            for (int s = maxBufferCount; s < BufferQueueCore::NUM_BUFFER_SLOTS; ++s) {
                 assert(mSlots[s].mBufferState == BufferSlot::FREE);
                 if (mSlots[s].mGraphicBuffer != NULL) {
                     mCore->freeBufferLocked(s);
@@ -500,9 +496,9 @@ void BufferQueueProducer::cancelBuffer(int slot, const sp<Fence>& fence) {
         return;
     }
 
-    if (slot < 0 || slot >= BufferQueueDefs::NUM_BUFFER_SLOTS) {
+    if (slot < 0 || slot >= BufferQueueCore::NUM_BUFFER_SLOTS) {
         BQ_LOGE("cancelBuffer: slot index %d out of range [0, %d)",
-                slot, BufferQueueDefs::NUM_BUFFER_SLOTS);
+                slot, BufferQueueCore::NUM_BUFFER_SLOTS);
         return;
     } else if (mSlots[slot].mBufferState != BufferSlot::DEQUEUED) {
         BQ_LOGE("cancelBuffer: slot %d is not owned by the producer "

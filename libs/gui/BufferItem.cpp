@@ -38,9 +38,6 @@ BufferItem::BufferItem() :
 
 BufferItem::operator IGraphicBufferConsumer::BufferItem() const {
     IGraphicBufferConsumer::BufferItem bufferItem;
-    bufferItem.mGraphicBuffer = mGraphicBuffer;
-    bufferItem.mFence = mFence;
-    bufferItem.mCrop = mCrop;
     bufferItem.mTransform = mTransform;
     bufferItem.mScalingMode = mScalingMode;
     bufferItem.mTimestamp = mTimestamp;
@@ -50,6 +47,7 @@ BufferItem::operator IGraphicBufferConsumer::BufferItem() const {
     bufferItem.mIsDroppable = mIsDroppable;
     bufferItem.mAcquireCalled = mAcquireCalled;
     bufferItem.mTransformToDisplayInverse = mTransformToDisplayInverse;
+    bufferItem.mCrop = mCrop;
     return bufferItem;
 }
 
