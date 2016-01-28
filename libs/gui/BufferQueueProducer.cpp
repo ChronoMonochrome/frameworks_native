@@ -892,7 +892,7 @@ void BufferQueueProducer::allocateBuffers(bool async, uint32_t width,
                         continue;
                     }
 
-                    freeSlots.push_back(slot);
+                    freeSlots.push_front(slot);
                 }
             }
 
