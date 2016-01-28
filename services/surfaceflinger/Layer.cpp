@@ -144,7 +144,7 @@ Layer::~Layer() {
 // callbacks
 // ---------------------------------------------------------------------------
 
-void Layer::onLayerDisplayed(const sp<const DisplayDevice>& /* hw */,
+void Layer::onLayerDisplayed(const sp<const DisplayDevice>& hw,
         HWComposer::HWCLayerInterface* layer) {
     if (layer) {
         layer->onDisplayed();
@@ -404,7 +404,7 @@ void Layer::setPerFrameData(const sp<const DisplayDevice>& hw,
     layer.setBuffer(mActiveBuffer);
 }
 
-void Layer::setAcquireFence(const sp<const DisplayDevice>& /* hw */,
+void Layer::setAcquireFence(const sp<const DisplayDevice>& hw,
         HWComposer::HWCLayerInterface& layer) {
     int fenceFd = -1;
 
@@ -428,20 +428,14 @@ void Layer::setAcquireFence(const sp<const DisplayDevice>& /* hw */,
 // ---------------------------------------------------------------------------
 
 void Layer::draw(const sp<const DisplayDevice>& hw, const Region& clip) const {
-    onDraw(hw, clip, false);
+    onDraw(hw, clip);
 }
 
-void Layer::draw(const sp<const DisplayDevice>& hw,
-        bool useIdentityTransform) const {
-    onDraw(hw, Region(hw->bounds()), useIdentityTransform);
+void Layer::draw(const sp<const DisplayDevice>& hw) {
+    onDraw( hw, Region(hw->bounds()) );
 }
 
-void Layer::draw(const sp<const DisplayDevice>& hw) const {
-    onDraw(hw, Region(hw->bounds()), false);
-}
-
-void Layer::onDraw(const sp<const DisplayDevice>& hw, const Region& clip,
-        bool useIdentityTransform) const
+void Layer::onDraw(const sp<const DisplayDevice>& hw, const Region& clip) const
 {
     ATRACE_CALL();
 
@@ -504,17 +498,16 @@ void Layer::onDraw(const sp<const DisplayDevice>& hw, const Region& clip,
     } else {
         engine.setupLayerBlackedOut();
     }
-    drawWithOpenGL(hw, clip, useIdentityTransform);
+    drawWithOpenGL(hw, clip);
     engine.disableTexturing();
 }
 
 
-void Layer::clearWithOpenGL(const sp<const DisplayDevice>& hw,
-        const Region& /* clip */, float red, float green, float blue,
-        float alpha) const
+void Layer::clearWithOpenGL(const sp<const DisplayDevice>& hw, const Region& clip,
+        float red, float green, float blue, float alpha) const
 {
     RenderEngine& engine(mFlinger->getRenderEngine());
-    computeGeometry(hw, mMesh, false);
+    computeGeometry(hw, mMesh);
     engine.setupFillWithColor(red, green, blue, alpha);
     engine.drawMesh(mMesh);
 }
@@ -524,12 +517,12 @@ void Layer::clearWithOpenGL(
     clearWithOpenGL(hw, clip, 0,0,0,0);
 }
 
-void Layer::drawWithOpenGL(const sp<const DisplayDevice>& hw,
-        const Region& /* clip */, bool useIdentityTransform) const {
+void Layer::drawWithOpenGL(
+        const sp<const DisplayDevice>& hw, const Region& clip) const {
     const uint32_t fbHeight = hw->getHeight();
     const State& s(getDrawingState());
 
-    computeGeometry(hw, mMesh, useIdentityTransform);
+    computeGeometry(hw, mMesh);
 
     /*
      * NOTE: the way we compute the texture coordinates here produces
@@ -599,12 +592,10 @@ bool Layer::getOpacityForFormat(uint32_t format) {
 // local state
 // ----------------------------------------------------------------------------
 
-void Layer::computeGeometry(const sp<const DisplayDevice>& hw, Mesh& mesh,
-        bool useIdentityTransform) const
+void Layer::computeGeometry(const sp<const DisplayDevice>& hw, Mesh& mesh) const
 {
     const Layer::State& s(getDrawingState());
-    const Transform tr(useIdentityTransform ?
-            hw->getTransform() : hw->getTransform() * s.transform);
+    const Transform tr(hw->getTransform() * s.transform);
     const uint32_t hw_h = hw->getHeight();
     Rect win(s.active.w, s.active.h);
     if (!s.active.crop.isEmpty()) {

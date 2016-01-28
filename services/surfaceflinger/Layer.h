@@ -136,8 +136,7 @@ public:
     uint32_t getTransactionFlags(uint32_t flags);
     uint32_t setTransactionFlags(uint32_t flags);
 
-    void computeGeometry(const sp<const DisplayDevice>& hw, Mesh& mesh,
-            bool useIdentityTransform) const;
+    void computeGeometry(const sp<const DisplayDevice>& hw, Mesh& mesh) const;
     Rect computeBounds() const;
 
     sp<IBinder> getHandle();
@@ -180,8 +179,7 @@ protected:
     /*
      * onDraw - draws the surface.
      */
-    virtual void onDraw(const sp<const DisplayDevice>& hw, const Region& clip,
-            bool useIdentityTransform) const;
+    virtual void onDraw(const sp<const DisplayDevice>& hw, const Region& clip) const;
 
 public:
     // -----------------------------------------------------------------------
@@ -215,8 +213,7 @@ public:
      * and calls onDraw().
      */
     void draw(const sp<const DisplayDevice>& hw, const Region& clip) const;
-    void draw(const sp<const DisplayDevice>& hw, bool useIdentityTransform) const;
-    void draw(const sp<const DisplayDevice>& hw) const;
+    void draw(const sp<const DisplayDevice>& hw);
 
     /*
      * doTransaction - process the transaction. This is a good place to figure
@@ -327,8 +324,7 @@ private:
     // drawing
     void clearWithOpenGL(const sp<const DisplayDevice>& hw, const Region& clip,
             float r, float g, float b, float alpha) const;
-    void drawWithOpenGL(const sp<const DisplayDevice>& hw, const Region& clip,
-            bool useIdentityTransform) const;
+    void drawWithOpenGL(const sp<const DisplayDevice>& hw, const Region& clip) const;
 
 
     // -----------------------------------------------------------------------

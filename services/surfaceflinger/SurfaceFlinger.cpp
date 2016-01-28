@@ -191,7 +191,7 @@ SurfaceFlinger::~SurfaceFlinger()
     eglTerminate(display);
 }
 
-void SurfaceFlinger::binderDied(const wp<IBinder>& /* who */)
+void SurfaceFlinger::binderDied(const wp<IBinder>& who)
 {
     // the window manager died on us. prepare its eulogy.
 
@@ -645,12 +645,12 @@ void SurfaceFlinger::signalRefresh() {
 }
 
 status_t SurfaceFlinger::postMessageAsync(const sp<MessageBase>& msg,
-        nsecs_t reltime, uint32_t /* flags */) {
+        nsecs_t reltime, uint32_t flags) {
     return mEventQueue.postMessage(msg, reltime);
 }
 
 status_t SurfaceFlinger::postMessageSync(const sp<MessageBase>& msg,
-        nsecs_t reltime, uint32_t /* flags */) {
+        nsecs_t reltime, uint32_t flags) {
     status_t res = mEventQueue.postMessage(msg, reltime);
     if (res == NO_ERROR) {
         msg->wait();
@@ -1741,7 +1741,7 @@ status_t SurfaceFlinger::removeLayer(const sp<Layer>& layer) {
     return status_t(index);
 }
 
-uint32_t SurfaceFlinger::peekTransactionFlags(uint32_t /* flags */) {
+uint32_t SurfaceFlinger::peekTransactionFlags(uint32_t flags) {
     return android_atomic_release_load(&mTransactionFlags);
 }
 
@@ -2256,8 +2256,8 @@ status_t SurfaceFlinger::dump(int fd, const Vector<String16>& args)
     return NO_ERROR;
 }
 
-void SurfaceFlinger::listLayersLocked(const Vector<String16>& /* args */,
-        size_t& /* index */, String8& result) const
+void SurfaceFlinger::listLayersLocked(const Vector<String16>& args, size_t& index,
+        String8& result) const
 {
     const LayerVector& currentLayers = mCurrentState.layersSortedByZ;
     const size_t count = currentLayers.size();
@@ -2295,7 +2295,7 @@ void SurfaceFlinger::dumpStatsLocked(const Vector<String16>& args, size_t& index
 }
 
 void SurfaceFlinger::clearStatsLocked(const Vector<String16>& args, size_t& index,
-        String8& /* result */)
+        String8& result)
 {
     String8 name;
     if (index < args.size()) {
@@ -2703,7 +2703,7 @@ class GraphicProducerWrapper : public BBinder, public MessageHandler {
      * data and reply Parcel and forward them to the calling thread.
      */
     virtual status_t transact(uint32_t code,
-            const Parcel& data, Parcel* reply, uint32_t /* flags */) {
+            const Parcel& data, Parcel* reply, uint32_t flags) {
         mLock.lock();
         this->code = code;
         this->data = &data;
@@ -2759,8 +2759,7 @@ public:
 status_t SurfaceFlinger::captureScreen(const sp<IBinder>& display,
         const sp<IGraphicBufferProducer>& producer,
         uint32_t reqWidth, uint32_t reqHeight,
-        uint32_t minLayerZ, uint32_t maxLayerZ,
-        bool useIdentityTransform) {
+        uint32_t minLayerZ, uint32_t maxLayerZ) {
 
     if (CC_UNLIKELY(display == 0))
         return BAD_VALUE;
@@ -2786,19 +2785,16 @@ status_t SurfaceFlinger::captureScreen(const sp<IBinder>& display,
         sp<IGraphicBufferProducer> producer;
         uint32_t reqWidth, reqHeight;
         uint32_t minLayerZ,maxLayerZ;
-        bool useIdentityTransform;
         status_t result;
     public:
         MessageCaptureScreen(SurfaceFlinger* flinger,
                 const sp<IBinder>& display,
                 const sp<IGraphicBufferProducer>& producer,
                 uint32_t reqWidth, uint32_t reqHeight,
-                uint32_t minLayerZ, uint32_t maxLayerZ,
-                bool useIdentityTransform)
+                uint32_t minLayerZ, uint32_t maxLayerZ)
             : flinger(flinger), display(display), producer(producer),
               reqWidth(reqWidth), reqHeight(reqHeight),
               minLayerZ(minLayerZ), maxLayerZ(maxLayerZ),
-              useIdentityTransform(useIdentityTransform),
               result(PERMISSION_DENIED)
         {
         }
@@ -2808,9 +2804,8 @@ status_t SurfaceFlinger::captureScreen(const sp<IBinder>& display,
         virtual bool handler() {
             Mutex::Autolock _l(flinger->mStateLock);
             sp<const DisplayDevice> hw(flinger->getDisplayDevice(display));
-            result = flinger->captureScreenImplLocked(hw, producer,
-                    reqWidth, reqHeight, minLayerZ, maxLayerZ,
-                    useIdentityTransform);
+            result = flinger->captureScreenImplLocked(hw,
+                    producer, reqWidth, reqHeight, minLayerZ, maxLayerZ);
             static_cast<GraphicProducerWrapper*>(producer->asBinder().get())->exit(result);
             return true;
         }
@@ -2832,7 +2827,7 @@ status_t SurfaceFlinger::captureScreen(const sp<IBinder>& display,
     // which does the marshaling work forwards to our "fake remote" above.
     sp<MessageBase> msg = new MessageCaptureScreen(this,
             display, IGraphicBufferProducer::asInterface( wrapper ),
-            reqWidth, reqHeight, minLayerZ, maxLayerZ, useIdentityTransform);
+            reqWidth, reqHeight, minLayerZ, maxLayerZ);
 
     status_t res = postMessageAsync(msg);
     if (res == NO_ERROR) {
@@ -2846,7 +2841,7 @@ void SurfaceFlinger::renderScreenImplLocked(
         const sp<const DisplayDevice>& hw,
         uint32_t reqWidth, uint32_t reqHeight,
         uint32_t minLayerZ, uint32_t maxLayerZ,
-        bool yswap, bool useIdentityTransform)
+        bool yswap)
 {
     ATRACE_CALL();
     RenderEngine& engine(getRenderEngine());
@@ -2875,7 +2870,7 @@ void SurfaceFlinger::renderScreenImplLocked(
             if (state.z >= minLayerZ && state.z <= maxLayerZ) {
                 if (layer->isVisible()) {
                     if (filtering) layer->setFiltering(true);
-                    layer->draw(hw, useIdentityTransform);
+                    layer->draw(hw);
                     if (filtering) layer->setFiltering(false);
                 }
             }
@@ -2892,8 +2887,7 @@ status_t SurfaceFlinger::captureScreenImplLocked(
         const sp<const DisplayDevice>& hw,
         const sp<IGraphicBufferProducer>& producer,
         uint32_t reqWidth, uint32_t reqHeight,
-        uint32_t minLayerZ, uint32_t maxLayerZ,
-        bool useIdentityTransform)
+        uint32_t minLayerZ, uint32_t maxLayerZ)
 {
     ATRACE_CALL();
 
@@ -2948,7 +2942,7 @@ status_t SurfaceFlinger::captureScreenImplLocked(
                         // an EGLSurface and therefore we're not
                         // dependent on the context's EGLConfig.
                         renderScreenImplLocked(hw, reqWidth, reqHeight,
-                                minLayerZ, maxLayerZ, true, useIdentityTransform);
+                                minLayerZ, maxLayerZ, true);
 
                         // Attempt to create a sync khr object that can produce a sync point. If that
                         // isn't available, create a non-dupable sync object in the fallback path and

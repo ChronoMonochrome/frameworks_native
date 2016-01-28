@@ -39,13 +39,12 @@ LayerDim::LayerDim(SurfaceFlinger* flinger, const sp<Client>& client,
 LayerDim::~LayerDim() {
 }
 
-void LayerDim::onDraw(const sp<const DisplayDevice>& hw,
-        const Region& /* clip */, bool useIdentityTransform) const
+void LayerDim::onDraw(const sp<const DisplayDevice>& hw, const Region& clip) const
 {
     const State& s(getDrawingState());
     if (s.alpha>0) {
         Mesh mesh(Mesh::TRIANGLE_FAN, 4, 2);
-        computeGeometry(hw, mesh, useIdentityTransform);
+        computeGeometry(hw, mesh);
         RenderEngine& engine(mFlinger->getRenderEngine());
         engine.setupDimLayerBlending(s.alpha);
         engine.drawMesh(mesh);

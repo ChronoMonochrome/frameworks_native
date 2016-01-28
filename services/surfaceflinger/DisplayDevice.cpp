@@ -196,8 +196,6 @@ void DisplayDevice::flip(const Region& dirty) const
         eglSetSwapRectangleANDROID(dpy, surface,
                 b.left, b.top, b.width(), b.height());
     }
-#else
-    (void) dirty; // Eliminate unused parameter warning
 #endif
 
     mPageFlipCount++;
