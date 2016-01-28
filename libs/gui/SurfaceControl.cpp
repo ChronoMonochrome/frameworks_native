@@ -23,6 +23,7 @@
 
 #include <android/native_window.h>
 
+#include <utils/CallStack.h>
 #include <utils/Errors.h>
 #include <utils/Log.h>
 #include <utils/threads.h>

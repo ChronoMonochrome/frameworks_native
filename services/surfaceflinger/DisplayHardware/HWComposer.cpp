@@ -24,6 +24,7 @@
 #include <string.h>
 #include <sys/types.h>
 
+#include <utils/CallStack.h>
 #include <utils/Errors.h>
 #include <utils/misc.h>
 #include <utils/String8.h>

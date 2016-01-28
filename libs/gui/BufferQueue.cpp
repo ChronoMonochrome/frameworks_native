@@ -31,6 +31,7 @@
 
 #include <utils/Log.h>
 #include <utils/Trace.h>
+#include <utils/CallStack.h>
 
 // Macros for including the BufferQueue name in log messages
 #define ST_LOGV(x, ...) ALOGV("[%s] "x, mConsumerName.string(), ##__VA_ARGS__)
