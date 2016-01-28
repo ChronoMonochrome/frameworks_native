@@ -2774,7 +2774,7 @@ status_t SurfaceFlinger::captureScreen(const sp<IBinder>& display,
         const sp<IGraphicBufferProducer>& producer,
         Rect sourceCrop, uint32_t reqWidth, uint32_t reqHeight,
         uint32_t minLayerZ, uint32_t maxLayerZ,
-        bool useIdentityTransform, ISurfaceComposer::Rotation rotation) {
+        bool useIdentityTransform) {
 
     if (CC_UNLIKELY(display == 0))
         return BAD_VALUE;
@@ -2794,27 +2794,6 @@ status_t SurfaceFlinger::captureScreen(const sp<IBinder>& display,
         }
     }
 
-    // Convert to surfaceflinger's internal rotation type.
-    Transform::orientation_flags rotationFlags;
-    switch (rotation) {
-        case ISurfaceComposer::eRotateNone:
-            rotationFlags = Transform::ROT_0;
-            break;
-        case ISurfaceComposer::eRotate90:
-            rotationFlags = Transform::ROT_90;
-            break;
-        case ISurfaceComposer::eRotate180:
-            rotationFlags = Transform::ROT_180;
-            break;
-        case ISurfaceComposer::eRotate270:
-            rotationFlags = Transform::ROT_270;
-            break;
-        default:
-            rotationFlags = Transform::ROT_0;
-            ALOGE("Invalid rotation passed to captureScreen(): %d\n", rotation);
-            break;
-    }
-
     class MessageCaptureScreen : public MessageBase {
         SurfaceFlinger* flinger;
         sp<IBinder> display;
@@ -2823,7 +2802,6 @@ status_t SurfaceFlinger::captureScreen(const sp<IBinder>& display,
         uint32_t reqWidth, reqHeight;
         uint32_t minLayerZ,maxLayerZ;
         bool useIdentityTransform;
-        Transform::orientation_flags rotation;
         status_t result;
     public:
         MessageCaptureScreen(SurfaceFlinger* flinger,
@@ -2831,12 +2809,11 @@ status_t SurfaceFlinger::captureScreen(const sp<IBinder>& display,
                 const sp<IGraphicBufferProducer>& producer,
                 Rect sourceCrop, uint32_t reqWidth, uint32_t reqHeight,
                 uint32_t minLayerZ, uint32_t maxLayerZ,
-                bool useIdentityTransform, Transform::orientation_flags rotation)
+                bool useIdentityTransform)
             : flinger(flinger), display(display), producer(producer),
               sourceCrop(sourceCrop), reqWidth(reqWidth), reqHeight(reqHeight),
               minLayerZ(minLayerZ), maxLayerZ(maxLayerZ),
               useIdentityTransform(useIdentityTransform),
-              rotation(rotation),
               result(PERMISSION_DENIED)
         {
         }
@@ -2848,7 +2825,7 @@ status_t SurfaceFlinger::captureScreen(const sp<IBinder>& display,
             sp<const DisplayDevice> hw(flinger->getDisplayDevice(display));
             result = flinger->captureScreenImplLocked(hw, producer,
                     sourceCrop, reqWidth, reqHeight, minLayerZ, maxLayerZ,
-                    useIdentityTransform, rotation);
+                    useIdentityTransform);
             static_cast<GraphicProducerWrapper*>(producer->asBinder().get())->exit(result);
             return true;
         }
@@ -2871,7 +2848,7 @@ status_t SurfaceFlinger::captureScreen(const sp<IBinder>& display,
     sp<MessageBase> msg = new MessageCaptureScreen(this,
             display, IGraphicBufferProducer::asInterface( wrapper ),
             sourceCrop, reqWidth, reqHeight, minLayerZ, maxLayerZ,
-            useIdentityTransform, rotationFlags);
+            useIdentityTransform);
 
     status_t res = postMessageAsync(msg);
     if (res == NO_ERROR) {
@@ -2885,7 +2862,7 @@ void SurfaceFlinger::renderScreenImplLocked(
         const sp<const DisplayDevice>& hw,
         Rect sourceCrop, uint32_t reqWidth, uint32_t reqHeight,
         uint32_t minLayerZ, uint32_t maxLayerZ,
-        bool yswap, bool useIdentityTransform, Transform::orientation_flags rotation)
+        bool yswap, bool useIdentityTransform)
 {
     ATRACE_CALL();
     RenderEngine& engine(getRenderEngine());
@@ -2920,8 +2897,7 @@ void SurfaceFlinger::renderScreenImplLocked(
     engine.checkErrors();
 
     // set-up our viewport
-    engine.setViewportAndProjection(
-        reqWidth, reqHeight, sourceCrop, hw_h, yswap, rotation);
+    engine.setViewportAndProjection(reqWidth, reqHeight, sourceCrop, hw_h, yswap);
     engine.disableTexturing();
 
     // redraw the screen entirely...
@@ -2954,7 +2930,7 @@ status_t SurfaceFlinger::captureScreenImplLocked(
         const sp<IGraphicBufferProducer>& producer,
         Rect sourceCrop, uint32_t reqWidth, uint32_t reqHeight,
         uint32_t minLayerZ, uint32_t maxLayerZ,
-        bool useIdentityTransform, Transform::orientation_flags rotation)
+        bool useIdentityTransform)
 {
     ATRACE_CALL();
 
@@ -3008,9 +2984,8 @@ status_t SurfaceFlinger::captureScreenImplLocked(
                         // via an FBO, which means we didn't have to create
                         // an EGLSurface and therefore we're not
                         // dependent on the context's EGLConfig.
-                        renderScreenImplLocked(
-                            hw, sourceCrop, reqWidth, reqHeight, minLayerZ, maxLayerZ, true,
-                            useIdentityTransform, rotation);
+                        renderScreenImplLocked(hw, sourceCrop, reqWidth, reqHeight,
+                                minLayerZ, maxLayerZ, true, useIdentityTransform);
 
                         // Attempt to create a sync khr object that can produce a sync point. If that
                         // isn't available, create a non-dupable sync object in the fallback path and

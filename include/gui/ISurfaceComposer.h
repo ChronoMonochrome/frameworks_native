@@ -62,13 +62,6 @@ public:
         eDisplayIdHdmi = 1
     };
 
-    enum Rotation {
-        eRotateNone = 0,
-        eRotate90   = 1,
-        eRotate180  = 2,
-        eRotate270  = 3
-    };
-
     /* create connection with surface flinger, requires
      * ACCESS_SURFACE_FLINGER permission
      */
@@ -137,8 +130,7 @@ public:
             const sp<IGraphicBufferProducer>& producer,
             Rect sourceCrop, uint32_t reqWidth, uint32_t reqHeight,
             uint32_t minLayerZ, uint32_t maxLayerZ,
-            bool useIdentityTransform,
-            Rotation rotation = eRotateNone) = 0;
+            bool useIdentityTransform) = 0;
 
     /* Clears the frame statistics for animations.
      *

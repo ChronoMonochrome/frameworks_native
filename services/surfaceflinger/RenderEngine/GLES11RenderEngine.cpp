@@ -21,7 +21,6 @@
 
 #include <utils/String8.h>
 #include <cutils/compiler.h>
-#include <gui/ISurfaceComposer.h>
 
 #include "GLES11RenderEngine.h"
 #include "Mesh.h"
@@ -75,8 +74,7 @@ size_t GLES11RenderEngine::getMaxViewportDims() const {
 }
 
 void GLES11RenderEngine::setViewportAndProjection(
-        size_t vpw, size_t vph, Rect sourceCrop, size_t hwh, bool yswap,
-        Transform::orientation_flags rotation) {
+        size_t vpw, size_t vph, Rect sourceCrop, size_t hwh, bool yswap) {
     glViewport(0, 0, vpw, vph);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -93,38 +91,6 @@ void GLES11RenderEngine::setViewportAndProjection(
     } else {
         glOrthof(l, r, b, t, 0, 1);
     }
-
-    switch (rotation) {
-        case Transform::ROT_0:
-            break;
-        case Transform::ROT_90:
-        {
-            float x1 = (l+r)/2;
-            float y1 = (t+b)/2;
-            glTranslatef(x1-y1, x1+y1, 0);
-            glRotatef(270, 0, 0, 1);
-            break;
-        }
-        case Transform::ROT_180:
-        {
-            float x1 = (l+r)/2;
-            float y1 = (t+b)/2;
-            glTranslatef(x1*2, y1*2, 0);
-            glRotatef(180, 0, 0, 1);
-            break;
-        }
-        case Transform::ROT_270:
-        {
-            float x1 = (l+r)/2;
-            float y1 = (t+b)/2;
-            glTranslatef(x1+y1, y1-x1, 0);
-            glRotatef(90, 0, 0, 1);
-            break;
-        }
-        default:
-            break;
-    }
-
     glMatrixMode(GL_MODELVIEW);
 }
 
