@@ -38,7 +38,6 @@ namespace android {
 
 class DisplayInfo;
 class DisplaySurface;
-class IGraphicBufferProducer;
 class Layer;
 class SurfaceFlinger;
 class HWComposer;
@@ -57,8 +56,8 @@ public:
         DISPLAY_ID_INVALID = -1,
         DISPLAY_PRIMARY     = HWC_DISPLAY_PRIMARY,
         DISPLAY_EXTERNAL    = HWC_DISPLAY_EXTERNAL,
-        DISPLAY_VIRTUAL     = HWC_DISPLAY_VIRTUAL,
-        NUM_BUILTIN_DISPLAY_TYPES = HWC_NUM_PHYSICAL_DISPLAY_TYPES,
+        NUM_DISPLAY_TYPES   = HWC_NUM_DISPLAY_TYPES,
+        DISPLAY_VIRTUAL     = HWC_NUM_DISPLAY_TYPES
     };
 
     enum {

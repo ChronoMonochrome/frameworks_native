@@ -64,9 +64,7 @@ public:
     };
 
     enum {
-        NUM_BUILTIN_DISPLAYS = HWC_NUM_PHYSICAL_DISPLAY_TYPES,
-        MAX_HWC_DISPLAYS = HWC_NUM_DISPLAY_TYPES,
-        VIRTUAL_DISPLAY_ID_BASE = HWC_DISPLAY_VIRTUAL,
+        MAX_DISPLAYS = HWC_NUM_DISPLAY_TYPES + 1
     };
 
     HWComposer(
@@ -77,16 +75,15 @@ public:
 
     status_t initCheck() const;
 
-    // Returns a display ID starting at VIRTUAL_DISPLAY_ID_BASE, this ID is to
-    // be used with createWorkList (and all other methods requiring an ID
-    // below).
-    // IDs below NUM_BUILTIN_DISPLAYS are pre-defined and therefore are
-    // always valid.
-    // Returns -1 if an ID cannot be allocated
+    // returns a display ID starting at MAX_DISPLAYS, this ID
+    // is to be used with createWorkList (and all other
+    // methods requiring an ID below).
+    // IDs below MAX_DISPLAY are pre-defined and therefore are always valid.
+    // returns a negative error code if an ID cannot be allocated
     int32_t allocateDisplayId();
 
-    // Recycles the given virtual display ID and frees the associated worklist.
-    // IDs below NUM_BUILTIN_DISPLAYS are not recycled.
+    // recycles the given ID and frees the associated worklist.
+    // IDs below MAX_DISPLAYS are not recycled
     status_t freeDisplayId(int32_t id);
 
 
@@ -336,8 +333,8 @@ private:
     struct hwc_composer_device_1*   mHwc;
     // invariant: mLists[0] != NULL iff mHwc != NULL
     // mLists[i>0] can be NULL. that display is to be ignored
-    struct hwc_display_contents_1*  mLists[MAX_HWC_DISPLAYS];
-    DisplayData                     mDisplayData[MAX_HWC_DISPLAYS];
+    struct hwc_display_contents_1*  mLists[MAX_DISPLAYS];
+    DisplayData                     mDisplayData[MAX_DISPLAYS];
     size_t                          mNumDisplays;
 
     cb_context*                     mCBContext;
