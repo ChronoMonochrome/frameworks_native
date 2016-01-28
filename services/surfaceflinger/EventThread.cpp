@@ -36,10 +36,9 @@
 namespace android {
 // ---------------------------------------------------------------------------
 
-EventThread::EventThread(const sp<VSyncSource>& src)
-    : mVSyncSource(src),
+EventThread::EventThread(const sp<SurfaceFlinger>& flinger)
+    : mFlinger(flinger),
       mUseSoftwareVSync(false),
-      mVsyncEnabled(false),
       mDebugVsyncEnabled(false) {
 
     for (int32_t i=0 ; i<DisplayDevice::NUM_BUILTIN_DISPLAY_TYPES ; i++) {
@@ -111,13 +110,19 @@ void EventThread::onScreenAcquired() {
     }
 }
 
-void EventThread::onVSyncEvent(nsecs_t timestamp) {
+
+void EventThread::onVSyncReceived(int type, nsecs_t timestamp) {
+    ALOGE_IF(type >= DisplayDevice::NUM_BUILTIN_DISPLAY_TYPES,
+            "received vsync event for an invalid display (id=%d)", type);
+
     Mutex::Autolock _l(mLock);
-    mVSyncEvent[0].header.type = DisplayEventReceiver::DISPLAY_EVENT_VSYNC;
-    mVSyncEvent[0].header.id = 0;
-    mVSyncEvent[0].header.timestamp = timestamp;
-    mVSyncEvent[0].vsync.count++;
-    mCondition.broadcast();
+    if (type < DisplayDevice::NUM_BUILTIN_DISPLAY_TYPES) {
+        mVSyncEvent[type].header.type = DisplayEventReceiver::DISPLAY_EVENT_VSYNC;
+        mVSyncEvent[type].header.id = type;
+        mVSyncEvent[type].header.timestamp = timestamp;
+        mVSyncEvent[type].vsync.count++;
+        mCondition.broadcast();
+    }
 }
 
 void EventThread::onHotplugReceived(int type, bool connected) {
@@ -303,23 +308,18 @@ Vector< sp<EventThread::Connection> > EventThread::waitForEvent(
 void EventThread::enableVSyncLocked() {
     if (!mUseSoftwareVSync) {
         // never enable h/w VSYNC when screen is off
-        if (!mVsyncEnabled) {
-            mVsyncEnabled = true;
-            mVSyncSource->setCallback(static_cast<VSyncSource::Callback*>(this));
-            mVSyncSource->setVSyncEnabled(true);
-            mPowerHAL.vsyncHint(true);
-        }
+        mFlinger->eventControl(DisplayDevice::DISPLAY_PRIMARY,
+                SurfaceFlinger::EVENT_VSYNC, true);
+        mPowerHAL.vsyncHint(true);
     }
     mDebugVsyncEnabled = true;
 }
 
 void EventThread::disableVSyncLocked() {
-    if (mVsyncEnabled) {
-        mVsyncEnabled = false;
-        mVSyncSource->setVSyncEnabled(false);
-        mPowerHAL.vsyncHint(false);
-        mDebugVsyncEnabled = false;
-    }
+    mFlinger->eventControl(DisplayDevice::DISPLAY_PRIMARY,
+            SurfaceFlinger::EVENT_VSYNC, false);
+    mPowerHAL.vsyncHint(false);
+    mDebugVsyncEnabled = false;
 }
 
 void EventThread::dump(String8& result) const {
