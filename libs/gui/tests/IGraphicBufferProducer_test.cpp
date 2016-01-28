@@ -23,6 +23,7 @@
 #include <utils/threads.h>
 
 #include <ui/GraphicBuffer.h>
+#include <ui/FramebufferNativeWindow.h>
 
 #include <gui/BufferQueue.h>
 
