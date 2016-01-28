@@ -79,7 +79,7 @@ public:
     //
     // DisplaySurface interface
     //
-    virtual status_t beginFrame(bool mustRecompose);
+    virtual status_t beginFrame();
     virtual status_t prepareFrame(CompositionType compositionType);
     virtual status_t compositionComplete();
     virtual status_t advanceFrame();
@@ -221,8 +221,6 @@ private:
 
     const char* dbgStateStr() const;
     static const char* dbgSourceStr(Source s);
-
-    bool mMustRecompose;
 };
 
 // ---------------------------------------------------------------------------
