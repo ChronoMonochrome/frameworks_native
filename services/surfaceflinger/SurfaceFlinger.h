@@ -431,7 +431,6 @@ private:
     nsecs_t mBootTime;
     bool mGpuToCpuSupported;
     sp<EventThread> mEventThread;
-    sp<EventThread> mSFEventThread;
     sp<EventControlThread> mEventControlThread;
     EGLContext mEGLContext;
     EGLConfig mEGLConfig;
