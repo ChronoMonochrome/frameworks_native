@@ -329,7 +329,7 @@ status_t BnGraphicBufferProducer::onTransact(
             CHECK_INTERFACE(IGraphicBufferProducer, data, reply);
             sp<NativeHandle> stream;
             if (data.readInt32()) {
-                stream = NativeHandle::create(data.readNativeHandle(), true);
+                stream = NativeHandle::create(data.readNativeHandle());
             }
             status_t result = setSidebandStream(stream);
             reply->writeInt32(result);

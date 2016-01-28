@@ -392,7 +392,7 @@ public:
         }
         sp<NativeHandle> stream;
         if (reply.readInt32()) {
-            stream = NativeHandle::create(reply.readNativeHandle(), true);
+            stream = NativeHandle::create(reply.readNativeHandle());
         }
         return stream;
     }
