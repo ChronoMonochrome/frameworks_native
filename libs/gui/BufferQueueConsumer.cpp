@@ -160,10 +160,8 @@ status_t BufferQueueConsumer::acquireBuffer(BufferItem* outBuffer,
     }
 
     mCore->mQueue.erase(front);
-
-    // We might have freed a slot while dropping old buffers, or the producer
-    // may be blocked waiting for the number of buffers in the queue to
-    // decrease.
+    // TODO: Should this call be after we free a slot while dropping buffers?
+    // Simply acquiring the next buffer doesn't enable a producer to dequeue.
     mCore->mDequeueCondition.broadcast();
 
     ATRACE_INT(mCore->mConsumerName.string(), mCore->mQueue.size());
