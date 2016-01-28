@@ -874,7 +874,7 @@ status_t HWComposer::setOutputBuffer(int32_t id, const sp<Fence>& acquireFence,
     return NO_ERROR;
 }
 
-sp<Fence> HWComposer::getLastRetireFence(int32_t id) const {
+sp<Fence> HWComposer::getLastRetireFence(int32_t id) {
     if (uint32_t(id)>31 || !mAllocatedDisplayIDs.hasBit(id))
         return Fence::NO_FENCE;
     return mDisplayData[id].lastRetireFence;
