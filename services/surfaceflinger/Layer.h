@@ -280,7 +280,7 @@ public:
     /*
      * Returns if a frame is queued.
      */
-    bool hasQueuedFrame() const { return mQueuedFrames > 0 || mSidebandStreamChanged; }
+    bool hasQueuedFrame() const { return mQueuedFrames > 0; }
 
     // -----------------------------------------------------------------------
 
