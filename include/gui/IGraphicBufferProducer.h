@@ -294,33 +294,10 @@ public:
     // This method will fail if the connect was previously called on the
     // IGraphicBufferProducer and no corresponding disconnect call was made.
     //
-    // The token needs to be any opaque binder object that lives in the
-    // producer process -- it is solely used for obtaining a death notification
-    // when the producer is killed.
-    //
-    // The api should be one of the NATIVE_WINDOW_API_* values in <window.h>
-    //
-    // The producerControlledByApp should be set to true if the producer is hosted
-    // by an untrusted process (typically app_process-forked processes). If both
-    // the producer and the consumer are app-controlled then all buffer queues
-    // will operate in async mode regardless of the async flag.
-    //
-    // Upon success, the output will be filled with meaningful data
-    // (refer to QueueBufferOutput documentation above).
-    //
-    // Return of a value other than NO_ERROR means an error has occurred:
-    // * NO_INIT - one of the following occurred:
-    //             * the buffer queue was abandoned
-    //             * no consumer has yet connected
-    // * BAD_VALUE - one of the following has occurred:
-    //             * the producer is already connected
-    //             * api was out of range (see above).
-    // * DEAD_OBJECT - the token is hosted by an already-dead process
-    //
-    // Additional negative errors may be returned by the internals, they
-    // should be treated as opaque fatal unrecoverable errors.
-    virtual status_t connect(const sp<IBinder>& token,
-            int api, bool producerControlledByApp, QueueBufferOutput* output) = 0;
+    // outWidth, outHeight and outTransform are filled with the default width
+    // and height of the window and current transform applied to buffers,
+    // respectively.
+    virtual status_t connect(int api, bool producerControlledByApp, QueueBufferOutput* output) = 0;
 
     // disconnect attempts to disconnect a client API from the
     // IGraphicBufferProducer.  Calling this method will cause any subsequent

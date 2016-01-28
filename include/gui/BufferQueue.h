@@ -20,8 +20,6 @@
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 
-#include <binder/IBinder.h>
-
 #include <gui/IConsumerListener.h>
 #include <gui/IGraphicBufferAlloc.h>
 #include <gui/IGraphicBufferProducer.h>
@@ -37,9 +35,7 @@
 namespace android {
 // ----------------------------------------------------------------------------
 
-class BufferQueue : public BnGraphicBufferProducer,
-                    public BnGraphicBufferConsumer,
-                    private IBinder::DeathRecipient {
+class BufferQueue : public BnGraphicBufferProducer, public BnGraphicBufferConsumer {
 public:
     // BufferQueue will keep track of at most this value of buffers.
     // Attempts at runtime to increase the number of buffers past this will fail.
@@ -85,12 +81,6 @@ public:
     // needed gralloc buffers.
     BufferQueue(const sp<IGraphicBufferAlloc>& allocator = NULL);
     virtual ~BufferQueue();
-
-    /*
-     * IBinder::DeathRecipient interface
-     */
-
-    virtual void binderDied(const wp<IBinder>& who);
 
     /*
      * IGraphicBufferProducer interface
@@ -198,8 +188,7 @@ public:
     // it's still connected to a producer).
     //
     // APIs are enumerated in window.h (e.g. NATIVE_WINDOW_API_CPU).
-    virtual status_t connect(const sp<IBinder>& token,
-            int api, bool producerControlledByApp, QueueBufferOutput* output);
+    virtual status_t connect(int api, bool producerControlledByApp, QueueBufferOutput* output);
 
     // disconnect attempts to disconnect a producer API from the BufferQueue.
     // Calling this method will cause any subsequent calls to other
@@ -572,9 +561,6 @@ private:
 
     // mTransformHint is used to optimize for screen rotations
     uint32_t mTransformHint;
-
-    // mConnectedProducerToken is used to set a binder death notification on the producer
-    sp<IBinder> mConnectedProducerToken;
 };
 
 // ----------------------------------------------------------------------------
