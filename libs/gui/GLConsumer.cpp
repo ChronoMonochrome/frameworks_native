@@ -116,8 +116,8 @@ static bool isEglImageCroppable(const Rect& crop) {
     return hasEglAndroidImageCrop() && (crop.left == 0 && crop.top == 0);
 }
 
-GLConsumer::GLConsumer(const sp<IGraphicBufferConsumer>& bq, uint32_t tex,
-        uint32_t texTarget, bool useFenceSync, bool isControlledByApp) :
+GLConsumer::GLConsumer(const sp<BufferQueue>& bq, GLuint tex,
+        GLenum texTarget, bool useFenceSync, bool isControlledByApp) :
     ConsumerBase(bq, isControlledByApp),
     mCurrentTransform(0),
     mCurrentScalingMode(NATIVE_WINDOW_SCALING_MODE_FREEZE),
@@ -158,12 +158,12 @@ GLConsumer::GLConsumer(const sp<IGraphicBufferConsumer>& bq, uint32_t tex,
     }
 #endif
 
-    mConsumer->setConsumerUsageBits(DEFAULT_USAGE_FLAGS);
+    mBufferQueue->setConsumerUsageBits(DEFAULT_USAGE_FLAGS);
 }
 
 status_t GLConsumer::setDefaultMaxBufferCount(int bufferCount) {
     Mutex::Autolock lock(mMutex);
-    return mConsumer->setDefaultMaxBufferCount(bufferCount);
+    return mBufferQueue->setDefaultMaxBufferCount(bufferCount);
 }
 
 #ifdef STE_HARDWARE
@@ -182,7 +182,7 @@ status_t GLConsumer::setDefaultBufferSize(uint32_t w, uint32_t h)
     Mutex::Autolock lock(mMutex);
     mDefaultWidth = w;
     mDefaultHeight = h;
-    return mConsumer->setDefaultBufferSize(w, h);
+    return mBufferQueue->setDefaultBufferSize(w, h);
 }
 
 status_t GLConsumer::updateTexImage() {
@@ -1157,23 +1157,23 @@ void GLConsumer::abandonLocked() {
 void GLConsumer::setName(const String8& name) {
     Mutex::Autolock _l(mMutex);
     mName = name;
-    mConsumer->setConsumerName(name);
+    mBufferQueue->setConsumerName(name);
 }
 
 status_t GLConsumer::setDefaultBufferFormat(uint32_t defaultFormat) {
     Mutex::Autolock lock(mMutex);
-    return mConsumer->setDefaultBufferFormat(defaultFormat);
+    return mBufferQueue->setDefaultBufferFormat(defaultFormat);
 }
 
 status_t GLConsumer::setConsumerUsageBits(uint32_t usage) {
     Mutex::Autolock lock(mMutex);
     usage |= DEFAULT_USAGE_FLAGS;
-    return mConsumer->setConsumerUsageBits(usage);
+    return mBufferQueue->setConsumerUsageBits(usage);
 }
 
 status_t GLConsumer::setTransformHint(uint32_t hint) {
     Mutex::Autolock lock(mMutex);
-    return mConsumer->setTransformHint(hint);
+    return mBufferQueue->setTransformHint(hint);
 }
 
 void GLConsumer::dumpLocked(String8& result, const char* prefix) const

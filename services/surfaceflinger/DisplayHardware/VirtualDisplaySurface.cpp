@@ -40,10 +40,8 @@ static const char* dbgCompositionTypeStr(DisplaySurface::CompositionType type) {
 }
 
 VirtualDisplaySurface::VirtualDisplaySurface(HWComposer& hwc, int32_t dispId,
-        const sp<IGraphicBufferProducer>& sink,
-        const sp<BufferQueue>& bq,
-        const String8& name)
-:   ConsumerBase(bq),
+        const sp<IGraphicBufferProducer>& sink, const String8& name)
+:   ConsumerBase(new BufferQueue()),
     mHwc(hwc),
     mDisplayId(dispId),
     mDisplayName(name),
@@ -53,7 +51,7 @@ VirtualDisplaySurface::VirtualDisplaySurface(HWComposer& hwc, int32_t dispId,
     mDbgLastCompositionType(COMPOSITION_UNKNOWN)
 {
     mSource[SOURCE_SINK] = sink;
-    mSource[SOURCE_SCRATCH] = bq;
+    mSource[SOURCE_SCRATCH] = mBufferQueue;
 
     resetPerFrameState();
 
@@ -62,13 +60,24 @@ VirtualDisplaySurface::VirtualDisplaySurface(HWComposer& hwc, int32_t dispId,
     mSource[SOURCE_SINK]->query(NATIVE_WINDOW_HEIGHT, &sinkHeight);
 
     ConsumerBase::mName = String8::format("VDS: %s", mDisplayName.string());
-    mConsumer->setConsumerName(ConsumerBase::mName);
-    mConsumer->setConsumerUsageBits(GRALLOC_USAGE_HW_COMPOSER);
-    mConsumer->setDefaultBufferSize(sinkWidth, sinkHeight);
-    mConsumer->setDefaultMaxBufferCount(2);
+    mBufferQueue->setConsumerName(ConsumerBase::mName);
+    mBufferQueue->setConsumerUsageBits(GRALLOC_USAGE_HW_COMPOSER);
+    mBufferQueue->setDefaultBufferSize(sinkWidth, sinkHeight);
+    mBufferQueue->setDefaultMaxBufferCount(2);
 }
 
 VirtualDisplaySurface::~VirtualDisplaySurface() {
+}
+
+sp<IGraphicBufferProducer> VirtualDisplaySurface::getIGraphicBufferProducer() const {
+    if (mDisplayId >= 0) {
+        return static_cast<IGraphicBufferProducer*>(
+                const_cast<VirtualDisplaySurface*>(this));
+    } else {
+        // There won't be any interaction with HWC for this virtual display,
+        // so the GLES driver can pass buffers directly to the sink.
+        return mSource[SOURCE_SINK];
+    }
 }
 
 status_t VirtualDisplaySurface::prepareFrame(CompositionType compositionType) {
@@ -285,7 +294,7 @@ status_t VirtualDisplaySurface::queueBuffer(int pslot,
         // Queue the buffer back into the scratch pool
         QueueBufferOutput scratchQBO;
         int sslot = mapProducer2SourceSlot(SOURCE_SCRATCH, pslot);
-        result = mSource[SOURCE_SCRATCH]->queueBuffer(sslot, input, &scratchQBO);
+        result = mBufferQueue->queueBuffer(sslot, input, &scratchQBO);
         if (result != NO_ERROR)
             return result;
 

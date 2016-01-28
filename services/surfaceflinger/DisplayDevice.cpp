@@ -59,7 +59,6 @@ DisplayDevice::DisplayDevice(
         bool isSecure,
         const wp<IBinder>& displayToken,
         const sp<DisplaySurface>& displaySurface,
-        const sp<IGraphicBufferProducer>& producer,
         EGLConfig config)
     : mFlinger(flinger),
       mType(type), mHwcDisplayId(hwcId),

@@ -30,7 +30,7 @@
 
 namespace android {
 
-CpuConsumer::CpuConsumer(const sp<IGraphicBufferConsumer>& bq,
+CpuConsumer::CpuConsumer(const sp<BufferQueue>& bq,
         uint32_t maxLockedBuffers, bool controlledByApp) :
     ConsumerBase(bq, controlledByApp),
     mMaxLockedBuffers(maxLockedBuffers),
@@ -39,8 +39,8 @@ CpuConsumer::CpuConsumer(const sp<IGraphicBufferConsumer>& bq,
     // Create tracking entries for locked buffers
     mAcquiredBuffers.insertAt(0, maxLockedBuffers);
 
-    mConsumer->setConsumerUsageBits(GRALLOC_USAGE_SW_READ_OFTEN);
-    mConsumer->setMaxAcquiredBufferCount(maxLockedBuffers);
+    mBufferQueue->setConsumerUsageBits(GRALLOC_USAGE_SW_READ_OFTEN);
+    mBufferQueue->setMaxAcquiredBufferCount(maxLockedBuffers);
 }
 
 CpuConsumer::~CpuConsumer() {
@@ -52,19 +52,19 @@ CpuConsumer::~CpuConsumer() {
 void CpuConsumer::setName(const String8& name) {
     Mutex::Autolock _l(mMutex);
     mName = name;
-    mConsumer->setConsumerName(name);
+    mBufferQueue->setConsumerName(name);
 }
 
 status_t CpuConsumer::setDefaultBufferSize(uint32_t width, uint32_t height)
 {
     Mutex::Autolock _l(mMutex);
-    return mConsumer->setDefaultBufferSize(width, height);
+    return mBufferQueue->setDefaultBufferSize(width, height);
 }
 
 status_t CpuConsumer::setDefaultBufferFormat(uint32_t defaultFormat)
 {
     Mutex::Autolock _l(mMutex);
-    return mConsumer->setDefaultBufferFormat(defaultFormat);
+    return mBufferQueue->setDefaultBufferFormat(defaultFormat);
 }
 
 status_t CpuConsumer::lockNextBuffer(LockedBuffer *nativeBuffer) {

@@ -262,9 +262,6 @@ public:
     // Return of a value other than NO_ERROR means an unknown error has occurred.
     virtual status_t setTransformHint(uint32_t hint) = 0;
 
-    // dump state into a string
-    virtual void dump(String8& result, const char* prefix) const = 0;
-
 public:
     DECLARE_META_INTERFACE(GraphicBufferConsumer);
 };

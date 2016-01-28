@@ -86,6 +86,10 @@ public:
     BufferQueue(const sp<IGraphicBufferAlloc>& allocator = NULL);
     virtual ~BufferQueue();
 
+    // dump our state in a String
+    virtual void dump(String8& result) const;
+    virtual void dump(String8& result, const char* prefix) const;
+
     /*
      * IGraphicBufferProducer interface
      */

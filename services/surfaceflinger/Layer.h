@@ -140,7 +140,7 @@ public:
     Rect computeBounds() const;
 
     sp<IBinder> getHandle();
-    sp<IGraphicBufferProducer> getBufferQueue() const;
+    sp<BufferQueue> getBufferQueue() const;
     const String8& getName() const;
 
     // -----------------------------------------------------------------------

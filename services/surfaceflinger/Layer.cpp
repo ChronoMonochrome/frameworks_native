@@ -114,8 +114,10 @@ Layer::Layer(SurfaceFlinger* flinger, const sp<Client>& client,
 
 void Layer::onFirstRef() {
     // Creates a custom BufferQueue for SurfaceFlingerConsumer to use
-    mBufferQueue = new SurfaceTextureLayer(mFlinger);
-    mSurfaceFlingerConsumer = new SurfaceFlingerConsumer(mBufferQueue, mTextureName);
+    sp<BufferQueue> bq = new SurfaceTextureLayer(mFlinger);
+    mSurfaceFlingerConsumer = new SurfaceFlingerConsumer(bq, mTextureName,
+            GL_TEXTURE_EXTERNAL_OES, false);
+
     mSurfaceFlingerConsumer->setConsumerUsageBits(getEffectiveUsage(0));
     mSurfaceFlingerConsumer->setFrameAvailableListener(this);
     mSurfaceFlingerConsumer->setName(mName);
@@ -227,8 +229,8 @@ sp<IBinder> Layer::getHandle() {
     return new Handle(mFlinger, this);
 }
 
-sp<IGraphicBufferProducer> Layer::getBufferQueue() const {
-    return mBufferQueue;
+sp<BufferQueue> Layer::getBufferQueue() const {
+    return mSurfaceFlingerConsumer->getBufferQueue();
 }
 
 // ---------------------------------------------------------------------------
@@ -926,7 +928,7 @@ Region Layer::latchBuffer(bool& recomputeVisibleRegions)
             }
 
             virtual bool reject(const sp<GraphicBuffer>& buf,
-                    const IGraphicBufferConsumer::BufferItem& item) {
+                    const BufferQueue::BufferItem& item) {
                 if (buf == NULL) {
                     return false;
                 }

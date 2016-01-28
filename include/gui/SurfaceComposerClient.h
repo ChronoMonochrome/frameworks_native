@@ -172,7 +172,6 @@ public:
 
 private:
     mutable sp<CpuConsumer> mCpuConsumer;
-    mutable sp<BufferQueue> mBufferQueue;
     CpuConsumer::LockedBuffer mBuffer;
     bool mHaveBuffer;
 

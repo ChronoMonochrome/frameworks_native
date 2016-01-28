@@ -34,14 +34,8 @@ BufferItemConsumer::BufferItemConsumer(
         int bufferCount, bool controlledByApp) :
     ConsumerBase(consumer, controlledByApp)
 {
-    status_t err = mConsumer->setConsumerUsageBits(consumerUsage);
-    LOG_ALWAYS_FATAL_IF(err != OK,
-            "Failed to set consumer usage bits to %#x", consumerUsage);
-    if (bufferCount != DEFAULT_MAX_BUFFERS) {
-        err = mConsumer->setMaxAcquiredBufferCount(bufferCount);
-        LOG_ALWAYS_FATAL_IF(err != OK,
-                "Failed to set max acquired buffer count to %d", bufferCount);
-    }
+    mBufferQueue->setConsumerUsageBits(consumerUsage);
+    mBufferQueue->setMaxAcquiredBufferCount(bufferCount);
 }
 
 BufferItemConsumer::~BufferItemConsumer() {
@@ -50,7 +44,7 @@ BufferItemConsumer::~BufferItemConsumer() {
 void BufferItemConsumer::setName(const String8& name) {
     Mutex::Autolock _l(mMutex);
     mName = name;
-    mConsumer->setConsumerName(name);
+    mBufferQueue->setConsumerName(name);
 }
 
 status_t BufferItemConsumer::acquireBuffer(BufferItem *item,
@@ -102,12 +96,12 @@ status_t BufferItemConsumer::releaseBuffer(const BufferItem &item,
 
 status_t BufferItemConsumer::setDefaultBufferSize(uint32_t w, uint32_t h) {
     Mutex::Autolock _l(mMutex);
-    return mConsumer->setDefaultBufferSize(w, h);
+    return mBufferQueue->setDefaultBufferSize(w, h);
 }
 
 status_t BufferItemConsumer::setDefaultBufferFormat(uint32_t defaultFormat) {
     Mutex::Autolock _l(mMutex);
-    return mConsumer->setDefaultBufferFormat(defaultFormat);
+    return mBufferQueue->setDefaultBufferFormat(defaultFormat);
 }
 
 } // namespace android

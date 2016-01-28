@@ -66,6 +66,10 @@ public:
     // log messages.
     void setName(const String8& name);
 
+    // getBufferQueue returns the BufferQueue object to which this
+    // ConsumerBase is connected.
+    sp<BufferQueue> getBufferQueue() const;
+
     // dump writes the current state to a string. Child classes should add
     // their state to the dump by overriding the dumpLocked method, which is
     // called by these methods after locking the mutex.
@@ -81,11 +85,12 @@ private:
     void operator=(const ConsumerBase&);
 
 protected:
+
     // ConsumerBase constructs a new ConsumerBase object to consume image
-    // buffers from the given IGraphicBufferConsumer.
+    // buffers from the given BufferQueue.
     // The controlledByApp flag indicates that this consumer is under the application's
     // control.
-    ConsumerBase(const sp<IGraphicBufferConsumer>& consumer, bool controlledByApp = false);
+    ConsumerBase(const sp<BufferQueue> &bufferQueue, bool controlledByApp = false);
 
     // onLastStrongRef gets called by RefBase just before the dtor of the most
     // derived class.  It is used to clean up the buffers so that ConsumerBase
@@ -99,7 +104,7 @@ protected:
     // from the derived class.
     virtual void onLastStrongRef(const void* id);
 
-    // Implementation of the IConsumerListener interface.  These
+    // Implementation of the BufferQueue::ConsumerListener interface.  These
     // calls are used to notify the ConsumerBase of asynchronous events in the
     // BufferQueue.  These methods should not need to be overridden by derived
     // classes, but if they are overridden the ConsumerBase implementation
@@ -150,7 +155,7 @@ protected:
     // initialization that must take place the first time a buffer is assigned
     // to a slot.  If it is overridden the derived class's implementation must
     // call ConsumerBase::acquireBufferLocked.
-    virtual status_t acquireBufferLocked(IGraphicBufferConsumer::BufferItem *item,
+    virtual status_t acquireBufferLocked(BufferQueue::BufferItem *item,
         nsecs_t presentWhen);
 
     // releaseBufferLocked relinquishes control over a buffer, returning that
@@ -224,7 +229,7 @@ protected:
 
     // The ConsumerBase has-a BufferQueue and is responsible for creating this object
     // if none is supplied
-    sp<IGraphicBufferConsumer> mConsumer;
+    sp<BufferQueue> mBufferQueue;
 
     // mMutex is the mutex used to prevent concurrent access to the member
     // variables of ConsumerBase objects. It must be locked whenever the
