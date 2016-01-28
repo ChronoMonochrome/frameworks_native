@@ -79,7 +79,6 @@ public:
     //
     // DisplaySurface interface
     //
-    virtual status_t beginFrame();
     virtual status_t prepareFrame(CompositionType compositionType);
     virtual status_t compositionComplete();
     virtual status_t advanceFrame();
@@ -113,7 +112,6 @@ private:
             int* sslot, sp<Fence>* fence, bool async);
     void updateQueueBufferOutput(const QueueBufferOutput& qbo);
     void resetPerFrameState();
-    status_t refreshOutputBuffer();
 
     // Both the sink and scratch buffer pools have their own set of slots
     // ("source slots", or "sslot"). We have to merge these into the single
@@ -171,10 +169,6 @@ private:
     // target buffer.
     sp<Fence> mFbFence;
 
-    // mOutputFence is the fence HWC should wait for before writing to the
-    // output buffer.
-    sp<Fence> mOutputFence;
-
     // Producer slot numbers for the buffers to use for HWC framebuffer target
     // and output.
     int mFbProducerSlot;
@@ -187,8 +181,7 @@ private:
     // +-----------+-------------------+-------------+
     // | State     | Event             || Next State |
     // +-----------+-------------------+-------------+
-    // | IDLE      | beginFrame        || BEGUN      |
-    // | BEGUN     | prepareFrame      || PREPARED   |
+    // | IDLE      | prepareFrame      || PREPARED   |
     // | PREPARED  | dequeueBuffer [1] || GLES       |
     // | PREPARED  | advanceFrame [2]  || HWC        |
     // | GLES      | queueBuffer       || GLES_DONE  |
@@ -201,10 +194,7 @@ private:
     enum DbgState {
         // no buffer dequeued, don't know anything about the next frame
         DBG_STATE_IDLE,
-        // output buffer dequeued, framebuffer source not yet known
-        DBG_STATE_BEGUN,
-        // output buffer dequeued, framebuffer source known but not provided
-        // to GLES yet.
+        // no buffer dequeued, but we know the buffer source for the frame
         DBG_STATE_PREPARED,
         // GLES driver has a buffer dequeued
         DBG_STATE_GLES,

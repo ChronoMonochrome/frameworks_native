@@ -203,10 +203,6 @@ void DisplayDevice::flip(const Region& dirty) const
     mPageFlipCount++;
 }
 
-status_t DisplayDevice::beginFrame() const {
-    return mDisplaySurface->beginFrame();
-}
-
 status_t DisplayDevice::prepareFrame(const HWComposer& hwc) const {
     DisplaySurface::CompositionType compositionType;
     bool haveGles = hwc.hasGlesComposition(mHwcDisplayId);
