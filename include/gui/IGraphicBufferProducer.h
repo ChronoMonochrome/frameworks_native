@@ -197,25 +197,15 @@ public:
         friend class Flattenable<QueueBufferInput>;
 #endif
         inline QueueBufferInput(const Parcel& parcel);
-        // timestamp - a monotonically increasing value in nanoseconds
-        // isAutoTimestamp - if the timestamp was synthesized at queue time
-        // crop - a crop rectangle that's used as a hint to the consumer
-        // scalingMode - a set of flags from NATIVE_WINDOW_SCALING_* in <window.h>
-        // transform - a set of flags from NATIVE_WINDOW_TRANSFORM_* in <window.h>
-        // async - if the buffer is queued in asynchronous mode
-        // fence - a fence that the consumer must wait on before reading the buffer,
-        //         set this to Fence::NO_FENCE if the buffer is ready immediately
-        inline QueueBufferInput(int64_t timestamp, bool isAutoTimestamp,
+        inline QueueBufferInput(int64_t timestamp,
                 const Rect& crop, int scalingMode, uint32_t transform, bool async,
                 const sp<Fence>& fence)
-        : timestamp(timestamp), isAutoTimestamp(isAutoTimestamp), crop(crop),
-          scalingMode(scalingMode), transform(transform), async(async),
-          fence(fence) { }
-        inline void deflate(int64_t* outTimestamp, bool* outIsAutoTimestamp,
-                Rect* outCrop, int* outScalingMode, uint32_t* outTransform,
-                bool* outAsync, sp<Fence>* outFence) const {
+        : timestamp(timestamp), crop(crop), scalingMode(scalingMode),
+          transform(transform), async(async), fence(fence) { }
+        inline void deflate(int64_t* outTimestamp, Rect* outCrop,
+                int* outScalingMode, uint32_t* outTransform, bool* outAsync,
+                sp<Fence>* outFence) const {
             *outTimestamp = timestamp;
-            *outIsAutoTimestamp = bool(isAutoTimestamp);
             *outCrop = crop;
             *outScalingMode = scalingMode;
             *outTransform = transform;
@@ -231,7 +221,6 @@ public:
 
     private:
         int64_t timestamp;
-        int isAutoTimestamp;
         Rect crop;
         int scalingMode;
         uint32_t transform;
