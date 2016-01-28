@@ -22,11 +22,7 @@
 namespace android {
 // ---------------------------------------------------------------------------
 
-#if defined(FORCE_HWC_COPY_FOR_VIRTUAL_DISPLAYS)
-static const bool sForceHwcCopy = true;
-#else
-static const bool sForceHwcCopy = false;
-#endif
+static bool sForceHwcCopy = FORCE_HWC_COPY_FOR_VIRTUAL_DISPLAYS;
 
 #define VDS_LOGE(msg, ...) ALOGE("[%s] "msg, \
         mDisplayName.string(), ##__VA_ARGS__)
