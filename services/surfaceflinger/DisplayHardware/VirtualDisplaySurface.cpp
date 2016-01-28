@@ -147,10 +147,6 @@ status_t VirtualDisplaySurface::advanceFrame() {
             mFbProducerSlot, fbBuffer.get(),
             mOutputProducerSlot, outBuffer.get());
 
-    // At this point we know the output buffer acquire fence,
-    // so update HWC state with it.
-    mHwc.setOutputBuffer(mDisplayId, mOutputFence, outBuffer);
-
     return mHwc.fbPost(mDisplayId, mFbFence, fbBuffer);
 }
 
@@ -418,11 +414,7 @@ status_t VirtualDisplaySurface::refreshOutputBuffer() {
         return result;
     mOutputProducerSlot = mapSource2ProducerSlot(SOURCE_SINK, sslot);
 
-    // On GLES-only frames, we don't have the right output buffer acquire fence
-    // until after GLES calls queueBuffer(). So here we just set the buffer
-    // (for use in HWC prepare) but not the fence; we'll call this again with
-    // the proper fence once we have it.
-    result = mHwc.setOutputBuffer(mDisplayId, Fence::NO_FENCE,
+    result = mHwc.setOutputBuffer(mDisplayId, mOutputFence,
             mProducerBuffers[mOutputProducerSlot]);
 
     return result;
