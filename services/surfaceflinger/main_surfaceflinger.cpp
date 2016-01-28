@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-#if defined(HAVE_PTHREADS)
-#include <sys/resource.h>
-#endif
-
-#include <cutils/sched_policy.h>
 #include <binder/IServiceManager.h>
 #include <binder/IPCThreadState.h>
 #include <binder/ProcessState.h>
@@ -32,20 +27,15 @@ int main(int, char**) {
     // binder threads to 4.
     ProcessState::self()->setThreadPoolMaxThreadCount(4);
 
-    // start the thread pool
-    sp<ProcessState> ps(ProcessState::self());
-    ps->startThreadPool();
-
     // instantiate surfaceflinger
     sp<SurfaceFlinger> flinger = new SurfaceFlinger();
 
-#if defined(HAVE_PTHREADS)
-    setpriority(PRIO_PROCESS, 0, PRIORITY_URGENT_DISPLAY);
-#endif
-    set_sched_policy(0, SP_FOREGROUND);
-
     // initialize before clients can connect
     flinger->init();
+
+    // start the thread pool
+    sp<ProcessState> ps(ProcessState::self());
+    ps->startThreadPool();
 
     // publish surface flinger
     sp<IServiceManager> sm(defaultServiceManager());

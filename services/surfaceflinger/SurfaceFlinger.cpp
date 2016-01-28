@@ -23,6 +23,10 @@
 #include <dlfcn.h>
 #include <inttypes.h>
 
+#if defined(HAVE_PTHREADS)
+#include <sys/resource.h>
+#endif
+
 #include <EGL/egl.h>
 
 #include <cutils/log.h>
@@ -667,6 +671,9 @@ status_t SurfaceFlinger::postMessageSync(const sp<MessageBase>& msg,
 }
 
 void SurfaceFlinger::run() {
+#if defined(HAVE_PTHREADS)
+    setpriority(PRIO_PROCESS, 0, PRIORITY_URGENT_DISPLAY);
+#endif
     do {
         waitForEvent();
     } while (true);
