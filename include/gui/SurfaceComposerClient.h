@@ -82,8 +82,11 @@ public:
     // returned by getDisplayInfo
     static status_t setActiveConfig(const sp<IBinder>& display, int id);
 
-    /* Triggers screen on/off or low power mode and waits for it to complete */
-    static void setDisplayPowerMode(const sp<IBinder>& display, int mode);
+    /* triggers screen off and waits for it to complete */
+    static void blankDisplay(const sp<IBinder>& display);
+
+    /* triggers screen on and waits for it to complete */
+    static void unblankDisplay(const sp<IBinder>& display);
 
     // ------------------------------------------------------------------------
     // surface creation / destruction

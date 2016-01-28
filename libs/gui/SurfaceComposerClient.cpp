@@ -655,9 +655,12 @@ status_t SurfaceComposerClient::setActiveConfig(const sp<IBinder>& display, int 
     return ComposerService::getComposerService()->setActiveConfig(display, id);
 }
 
-void SurfaceComposerClient::setDisplayPowerMode(const sp<IBinder>& token,
-        int mode) {
-    ComposerService::getComposerService()->setPowerMode(token, mode);
+void SurfaceComposerClient::blankDisplay(const sp<IBinder>& token) {
+    ComposerService::getComposerService()->blank(token);
+}
+
+void SurfaceComposerClient::unblankDisplay(const sp<IBinder>& token) {
+    ComposerService::getComposerService()->unblank(token);
 }
 
 status_t SurfaceComposerClient::clearAnimationFrameStats() {

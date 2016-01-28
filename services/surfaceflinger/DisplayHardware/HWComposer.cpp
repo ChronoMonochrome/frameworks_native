@@ -758,18 +758,19 @@ status_t HWComposer::commit() {
     return (status_t)err;
 }
 
-status_t HWComposer::setPowerMode(int disp, int mode) {
+status_t HWComposer::release(int disp) {
     LOG_FATAL_IF(disp >= VIRTUAL_DISPLAY_ID_BASE);
     if (mHwc) {
-        if (mode == HWC_POWER_MODE_OFF) {
-            eventControl(disp, HWC_EVENT_VSYNC, 0);
-        }
-        if (hwcHasApiVersion(mHwc, HWC_DEVICE_API_VERSION_1_4)) {
-            return (status_t)mHwc->setPowerMode(mHwc, disp, mode);
-        } else {
-            return (status_t)mHwc->blank(mHwc, disp,
-                    mode == HWC_POWER_MODE_OFF ? 1 : 0);
-        }
+        eventControl(disp, HWC_EVENT_VSYNC, 0);
+        return (status_t)mHwc->blank(mHwc, disp, 1);
+    }
+    return NO_ERROR;
+}
+
+status_t HWComposer::acquire(int disp) {
+    LOG_FATAL_IF(disp >= VIRTUAL_DISPLAY_ID_BASE);
+    if (mHwc) {
+        return (status_t)mHwc->blank(mHwc, disp, 0);
     }
     return NO_ERROR;
 }

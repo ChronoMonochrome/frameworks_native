@@ -430,7 +430,7 @@ void SurfaceFlinger::init() {
                 // for displays other than the main display, so we always
                 // assume a connected display is unblanked.
                 ALOGD("marking display %zu as acquired/unblanked", i);
-                hw->setPowerMode(HWC_POWER_MODE_NORMAL);
+                hw->acquireScreen();
             }
             mDisplays.add(token, hw);
         }
@@ -802,7 +802,7 @@ void SurfaceFlinger::doDebugFlashRegions()
     const bool repaintEverything = mRepaintEverything;
     for (size_t dpy=0 ; dpy<mDisplays.size() ; dpy++) {
         const sp<DisplayDevice>& hw(mDisplays[dpy]);
-        if (hw->isDisplayOn()) {
+        if (hw->canDraw()) {
             // transform the dirty region into this screen's coordinate space
             const Region dirtyRegion(hw->getDirtyRegion(repaintEverything));
             if (!dirtyRegion.isEmpty()) {
@@ -869,7 +869,7 @@ void SurfaceFlinger::postComposition()
 
     if (kIgnorePresentFences) {
         const sp<const DisplayDevice> hw(getDefaultDisplayDevice());
-        if (hw->isDisplayOn()) {
+        if (hw->isScreenAcquired()) {
             enableHardwareVsync();
         }
     }
@@ -904,7 +904,7 @@ void SurfaceFlinger::rebuildLayerStacks() {
             const sp<DisplayDevice>& hw(mDisplays[dpy]);
             const Transform& tr(hw->getTransform());
             const Rect bounds(hw->getBounds());
-            if (hw->isDisplayOn()) {
+            if (hw->canDraw()) {
                 SurfaceFlinger::computeVisibleRegions(layers,
                         hw->getLayerStack(), dirtyRegion, opaqueRegion);
 
@@ -1000,7 +1000,7 @@ void SurfaceFlinger::doComposition() {
     const bool repaintEverything = android_atomic_and(0, &mRepaintEverything);
     for (size_t dpy=0 ; dpy<mDisplays.size() ; dpy++) {
         const sp<DisplayDevice>& hw(mDisplays[dpy]);
-        if (hw->isDisplayOn()) {
+        if (hw->canDraw()) {
             // transform the dirty region into this screen's coordinate space
             const Region dirtyRegion(hw->getDirtyRegion(repaintEverything));
 
@@ -2078,7 +2078,7 @@ void SurfaceFlinger::onInitializeDisplays() {
     d.viewport.makeInvalid();
     displays.add(d);
     setTransactionState(state, displays, 0);
-    setPowerModeInternal(getDisplayDevice(d.token), HWC_POWER_MODE_NORMAL);
+    onScreenAcquired(getDefaultDisplayDevice());
 
     const nsecs_t period =
             getHwComposer().getRefreshPeriod(HWC_DISPLAY_PRIMARY);
@@ -2099,35 +2099,42 @@ void SurfaceFlinger::initializeDisplays() {
     postMessageAsync(msg);  // we may be called from main thread, use async message
 }
 
-void SurfaceFlinger::setPowerModeInternal(const sp<DisplayDevice>& hw,
-        int mode) {
-    ALOGD("Set power mode=%d, type=%d flinger=%p", mode, hw->getDisplayType(),
-            this);
+
+void SurfaceFlinger::onScreenAcquired(const sp<const DisplayDevice>& hw) {
+    ALOGD("Screen acquired, type=%d flinger=%p", hw->getDisplayType(), this);
+    if (hw->isScreenAcquired()) {
+        // this is expected, e.g. when power manager wakes up during boot
+        ALOGD(" screen was previously acquired");
+        return;
+    }
+
+    hw->acquireScreen();
     int32_t type = hw->getDisplayType();
-    int currentMode = hw->getPowerMode();
+    if (type < DisplayDevice::NUM_BUILTIN_DISPLAY_TYPES) {
+        // built-in display, tell the HWC
+        getHwComposer().acquire(type);
 
-    if (mode == currentMode) {
-        ALOGD("Screen type=%d is already mode=%d", hw->getDisplayType(), mode);
-        return;
-    }
-
-    hw->setPowerMode(mode);
-    if (type >= DisplayDevice::NUM_BUILTIN_DISPLAY_TYPES) {
-        ALOGW("Trying to set power mode for virtual display");
-        return;
-    }
-
-    if (currentMode == HWC_POWER_MODE_OFF) {
-        getHwComposer().setPowerMode(type, mode);
         if (type == DisplayDevice::DISPLAY_PRIMARY) {
             // FIXME: eventthread only knows about the main display right now
             mEventThread->onScreenAcquired();
+
             resyncToHardwareVsync(true);
         }
+    }
+    mVisibleRegionsDirty = true;
+    repaintEverything();
+}
 
-        mVisibleRegionsDirty = true;
-        repaintEverything();
-    } else if (mode == HWC_POWER_MODE_OFF) {
+void SurfaceFlinger::onScreenReleased(const sp<const DisplayDevice>& hw) {
+    ALOGD("Screen released, type=%d flinger=%p", hw->getDisplayType(), this);
+    if (!hw->isScreenAcquired()) {
+        ALOGD(" screen was previously released");
+        return;
+    }
+
+    hw->releaseScreen();
+    int32_t type = hw->getDisplayType();
+    if (type < DisplayDevice::NUM_BUILTIN_DISPLAY_TYPES) {
         if (type == DisplayDevice::DISPLAY_PRIMARY) {
             disableHardwareVsync(true); // also cancels any in-progress resync
 
@@ -2135,38 +2142,56 @@ void SurfaceFlinger::setPowerModeInternal(const sp<DisplayDevice>& hw,
             mEventThread->onScreenReleased();
         }
 
-        getHwComposer().setPowerMode(type, mode);
-        mVisibleRegionsDirty = true;
-        // from this point on, SF will stop drawing on this display
-    } else {
-        getHwComposer().setPowerMode(type, mode);
+        // built-in display, tell the HWC
+        getHwComposer().release(type);
     }
+    mVisibleRegionsDirty = true;
+    // from this point on, SF will stop drawing on this display
 }
 
-void SurfaceFlinger::setPowerMode(const sp<IBinder>& display, int mode) {
-    class MessageSetPowerMode: public MessageBase {
+void SurfaceFlinger::unblank(const sp<IBinder>& display) {
+    class MessageScreenAcquired : public MessageBase {
         SurfaceFlinger& mFlinger;
         sp<IBinder> mDisplay;
-        int mMode;
     public:
-        MessageSetPowerMode(SurfaceFlinger& flinger,
-                const sp<IBinder>& disp, int mode) : mFlinger(flinger),
-                    mDisplay(disp) { mMode = mode; }
+        MessageScreenAcquired(SurfaceFlinger& flinger,
+                const sp<IBinder>& disp) : mFlinger(flinger), mDisplay(disp) { }
         virtual bool handler() {
-            sp<DisplayDevice> hw(mFlinger.getDisplayDevice(mDisplay));
+            const sp<DisplayDevice> hw(mFlinger.getDisplayDevice(mDisplay));
             if (hw == NULL) {
-                ALOGE("Attempt to set power mode = %d for null display %p",
-                        mDisplay.get(), mMode);
+                ALOGE("Attempt to unblank null display %p", mDisplay.get());
             } else if (hw->getDisplayType() >= DisplayDevice::DISPLAY_VIRTUAL) {
-                ALOGW("Attempt to set power mode = %d for virtual display",
-                        mMode);
+                ALOGW("Attempt to unblank virtual display");
             } else {
-                mFlinger.setPowerModeInternal(hw, mMode);
+                mFlinger.onScreenAcquired(hw);
             }
             return true;
         }
     };
-    sp<MessageBase> msg = new MessageSetPowerMode(*this, display, mode);
+    sp<MessageBase> msg = new MessageScreenAcquired(*this, display);
+    postMessageSync(msg);
+}
+
+void SurfaceFlinger::blank(const sp<IBinder>& display) {
+    class MessageScreenReleased : public MessageBase {
+        SurfaceFlinger& mFlinger;
+        sp<IBinder> mDisplay;
+    public:
+        MessageScreenReleased(SurfaceFlinger& flinger,
+                const sp<IBinder>& disp) : mFlinger(flinger), mDisplay(disp) { }
+        virtual bool handler() {
+            const sp<DisplayDevice> hw(mFlinger.getDisplayDevice(mDisplay));
+            if (hw == NULL) {
+                ALOGE("Attempt to blank null display %p", mDisplay.get());
+            } else if (hw->getDisplayType() >= DisplayDevice::DISPLAY_VIRTUAL) {
+                ALOGW("Attempt to blank virtual display");
+            } else {
+                mFlinger.onScreenReleased(hw);
+            }
+            return true;
+        }
+    };
+    sp<MessageBase> msg = new MessageScreenReleased(*this, display);
     postMessageSync(msg);
 }
 
@@ -2415,8 +2440,8 @@ void SurfaceFlinger::dumpAllLocked(const Vector<String16>& args, size_t& index,
     mRenderEngine->dump(result);
 
     hw->undefinedRegion.dump(result, "undefinedRegion");
-    result.appendFormat("  orientation=%d, isDisplayOn=%d\n",
-            hw->getOrientation(), hw->isDisplayOn());
+    result.appendFormat("  orientation=%d, canDraw=%d\n",
+            hw->getOrientation(), hw->canDraw());
     result.appendFormat(
             "  last eglSwapBuffers() time: %f us\n"
             "  last transaction time     : %f us\n"
@@ -2508,9 +2533,10 @@ status_t SurfaceFlinger::onTransact(
         case CREATE_DISPLAY:
         case SET_TRANSACTION_STATE:
         case BOOT_FINISHED:
+        case BLANK:
+        case UNBLANK:
         case CLEAR_ANIMATION_FRAME_STATS:
         case GET_ANIMATION_FRAME_STATS:
-        case SET_POWER_MODE:
         {
             // codes that require permission check
             IPCThreadState* ipc = IPCThreadState::self();

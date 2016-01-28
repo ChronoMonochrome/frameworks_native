@@ -96,8 +96,11 @@ public:
     // commits the list
     status_t commit();
 
-    // set power mode
-    status_t setPowerMode(int disp, int mode);
+    // release hardware resources and blank screen
+    status_t release(int disp);
+
+    // acquire hardware resources and unblank screen
+    status_t acquire(int disp);
 
     // reset state when an external, non-virtual display is disconnected
     void disconnectDisplay(int disp);
