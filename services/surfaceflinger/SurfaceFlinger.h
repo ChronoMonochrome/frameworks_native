@@ -320,6 +320,10 @@ private:
     /* ------------------------------------------------------------------------
      * EGL
      */
+    static status_t selectConfigForAttribute(EGLDisplay dpy,
+        EGLint const* attrs, EGLint attribute, EGLint value, EGLConfig* outConfig);
+    static status_t selectEGLConfig(EGLDisplay disp, EGLint visualId,
+        EGLint renderableType, EGLConfig* config);
     size_t getMaxTextureSize() const;
     size_t getMaxViewportDims() const;
 
@@ -430,7 +434,9 @@ private:
     sp<EventThread> mSFEventThread;
     sp<EventControlThread> mEventControlThread;
     EGLContext mEGLContext;
+    EGLConfig mEGLConfig;
     EGLDisplay mEGLDisplay;
+    EGLint mEGLNativeVisualId;
     sp<IBinder> mBuiltinDisplays[DisplayDevice::NUM_BUILTIN_DISPLAY_TYPES];
 
     // Can only accessed from the main thread, these members
