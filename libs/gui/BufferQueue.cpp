@@ -103,11 +103,6 @@ status_t BufferQueue::detachProducerBuffer(int slot) {
     return mProducer->detachBuffer(slot);
 }
 
-status_t BufferQueue::detachNextBuffer(sp<GraphicBuffer>* outBuffer,
-        sp<Fence>* outFence) {
-    return mProducer->detachNextBuffer(outBuffer, outFence);
-}
-
 status_t BufferQueue::attachProducerBuffer(int* slot,
         const sp<GraphicBuffer>& buffer) {
     return mProducer->attachBuffer(slot, buffer);

@@ -203,10 +203,6 @@ public:
     // See IGraphicBufferProducer::detachBuffer
     virtual status_t detachProducerBuffer(int slot);
 
-    // See IGraphicBufferProducer::detachNextBuffer
-    virtual status_t detachNextBuffer(sp<GraphicBuffer>* outBuffer,
-            sp<Fence>* outFence);
-
     // See IGraphicBufferProducer::attachBuffer
     virtual status_t attachProducerBuffer(int* slot,
             const sp<GraphicBuffer>& buffer);
