@@ -209,10 +209,6 @@ public:
             Rect sourceCrop, uint32_t reqWidth, uint32_t reqHeight,
             uint32_t minLayerZ, uint32_t maxLayerZ,
             bool useIdentityTransform);
-    status_t update(const sp<IBinder>& display,
-            Rect sourceCrop, uint32_t reqWidth, uint32_t reqHeight,
-            uint32_t minLayerZ, uint32_t maxLayerZ,
-            bool useIdentityTransform, uint32_t rotation);
 
     sp<CpuConsumer> getCpuConsumer() const;
 
