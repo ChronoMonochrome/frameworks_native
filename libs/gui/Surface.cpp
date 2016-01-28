@@ -178,38 +178,19 @@ int Surface::setSwapInterval(int interval) {
 int Surface::dequeueBuffer(android_native_buffer_t** buffer, int* fenceFd) {
     ATRACE_CALL();
     ALOGV("Surface::dequeueBuffer");
-
-    int reqW;
-    int reqH;
-    bool swapIntervalZero;
-    uint32_t reqFormat;
-    uint32_t reqUsage;
-
-    {
-        Mutex::Autolock lock(mMutex);
-
-        reqW = mReqWidth ? mReqWidth : mUserWidth;
-        reqH = mReqHeight ? mReqHeight : mUserHeight;
-
-        swapIntervalZero = mSwapIntervalZero;
-        reqFormat = mReqFormat;
-        reqUsage = mReqUsage;
-    } // Drop the lock so that we can still touch the Surface while blocking in IGBP::dequeueBuffer
-
+    Mutex::Autolock lock(mMutex);
     int buf = -1;
+    int reqW = mReqWidth ? mReqWidth : mUserWidth;
+    int reqH = mReqHeight ? mReqHeight : mUserHeight;
     sp<Fence> fence;
-    status_t result = mGraphicBufferProducer->dequeueBuffer(&buf, &fence, swapIntervalZero,
-            reqW, reqH, reqFormat, reqUsage);
-
+    status_t result = mGraphicBufferProducer->dequeueBuffer(&buf, &fence, mSwapIntervalZero,
+            reqW, reqH, mReqFormat, mReqUsage);
     if (result < 0) {
-        ALOGV("dequeueBuffer: IGraphicBufferProducer::dequeueBuffer(%d, %d, %d, %d, %d)"
-             "failed: %d", swapIntervalZero, reqW, reqH, reqFormat, reqUsage,
+        ALOGV("dequeueBuffer: IGraphicBufferProducer::dequeueBuffer(%d, %d, %d, %d)"
+             "failed: %d", mReqWidth, mReqHeight, mReqFormat, mReqUsage,
              result);
         return result;
     }
-
-    Mutex::Autolock lock(mMutex);
-
     sp<GraphicBuffer>& gbuf(mSlots[buf].buffer);
 
     // this should never happen
