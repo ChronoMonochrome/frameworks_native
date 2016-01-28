@@ -101,5 +101,9 @@ status_t MonitoredProducer::setSidebandStream(const sp<NativeHandle>& stream) {
     return mProducer->setSidebandStream(stream);
 }
 
+IBinder* MonitoredProducer::onAsBinder() {
+    return mProducer->asBinder().get();
+}
+
 // ---------------------------------------------------------------------------
 }; // namespace android

@@ -49,6 +49,7 @@ public:
             bool producerControlledByApp, QueueBufferOutput* output);
     virtual status_t disconnect(int api);
     virtual status_t setSidebandStream(const sp<NativeHandle>& stream);
+    virtual IBinder* onAsBinder();
 
 private:
     sp<BnGraphicBufferProducer> mProducer;
