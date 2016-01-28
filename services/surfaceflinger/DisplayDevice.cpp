@@ -29,14 +29,6 @@
 
 #include <gui/Surface.h>
 
-#ifdef BOARD_EGL_NEEDS_LEGACY_FB
-#include <ui/FramebufferNativeWindow.h>
-#endif
-
-#include <GLES/gl.h>
-#include <EGL/egl.h>
-#include <EGL/eglext.h>
-
 #include <hardware/gralloc.h>
 
 #include "DisplayHardware/DisplaySurface.h"
@@ -86,11 +78,7 @@ DisplayDevice::DisplayDevice(
       mActiveConfig(0)
 {
     mNativeWindow = new Surface(producer, false);
-#ifndef BOARD_EGL_NEEDS_LEGACY_FB
     ANativeWindow* const window = mNativeWindow.get();
-#else
-    ANativeWindow* const window = new FramebufferNativeWindow();
-#endif
 
     /*
      * Create our display's surface
