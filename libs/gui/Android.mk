@@ -37,7 +37,13 @@ LOCAL_SHARED_LIBRARIES := \
 	libsync \
 	libui \
 	libutils \
+	libhardware \
 	liblog
+
+ifeq ($(BOARD_USES_STE_HARDWARE),true)
+	LOCAL_SHARED_LIBRARIES += \
+	libhardware
+endif
 
 
 LOCAL_MODULE:= libgui

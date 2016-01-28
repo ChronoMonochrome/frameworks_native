@@ -26,6 +26,9 @@
 
 #include <ui/DisplayInfo.h>
 #include <ui/PixelFormat.h>
+#ifdef STE_HARDWARE
+#include <ui/FramebufferNativeWindow.h>
+#endif
 
 #include <gui/Surface.h>
 
