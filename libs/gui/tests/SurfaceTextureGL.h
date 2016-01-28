@@ -37,10 +37,10 @@ protected:
 
     void SetUp() {
         GLTest::SetUp();
-        sp<IGraphicBufferProducer> producer;
-        BufferQueue::createBufferQueue(&producer, &mConsumer);
-        mST = new GLConsumer(mConsumer, TEX_ID);
-        mSTC = new Surface(producer);
+        sp<BufferQueue> bq = new BufferQueue();
+        mBQ = bq;
+        mST = new GLConsumer(bq, TEX_ID);
+        mSTC = new Surface(bq);
         mANW = mSTC;
         mTextureRenderer = new TextureRenderer(TEX_ID, mST);
         ASSERT_NO_FATAL_FAILURE(mTextureRenderer->SetUp());
@@ -60,7 +60,7 @@ protected:
         mTextureRenderer->drawTexture();
     }
 
-    sp<IGraphicBufferConsumer> mConsumer;
+    sp<BufferQueue> mBQ;
     sp<GLConsumer> mST;
     sp<Surface> mSTC;
     sp<ANativeWindow> mANW;

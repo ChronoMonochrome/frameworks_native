@@ -80,9 +80,11 @@ protected:
         ALOGV("Begin test: %s.%s", testInfo->test_case_name(),
                 testInfo->name());
 
+        mBQ = new BufferQueue();
         mDC = new DummyConsumer;
 
-        BufferQueue::createBufferQueue(&mProducer, &mConsumer);
+        mProducer = mBQ;
+        mConsumer = mBQ;
 
         // Test check: Can't connect producer if no consumer yet
         ASSERT_EQ(NO_INIT, TryConnectProducer());
@@ -199,6 +201,7 @@ protected:
     }
 
 private: // hide from test body
+    sp<BufferQueue> mBQ;
     sp<DummyConsumer> mDC;
 
 protected: // accessible from test body

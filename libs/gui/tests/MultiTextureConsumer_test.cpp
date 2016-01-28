@@ -34,11 +34,9 @@ protected:
 
     virtual void SetUp() {
         GLTest::SetUp();
-        sp<IGraphicBufferProducer> producer;
-        sp<IGraphicBufferConsumer> consumer;
-        BufferQueue::createBufferQueue(&producer, &consumer);
-        mGlConsumer = new GLConsumer(consumer, TEX_ID);
-        mSurface = new Surface(producer);
+        sp<BufferQueue> bq = new BufferQueue();
+        mGlConsumer = new GLConsumer(bq, TEX_ID);
+        mSurface = new Surface(bq);
         mANW = mSurface.get();
 
     }

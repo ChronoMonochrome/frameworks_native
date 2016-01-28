@@ -89,13 +89,11 @@ TEST_F(SurfaceTest, ScreenshotsOfProtectedBuffersSucceed) {
     sp<ANativeWindow> anw(mSurface);
 
     // Verify the screenshot works with no protected buffers.
-    sp<IGraphicBufferProducer> producer;
-    sp<IGraphicBufferConsumer> consumer;
-    BufferQueue::createBufferQueue(&producer, &consumer);
-    sp<CpuConsumer> cpuConsumer = new CpuConsumer(consumer, 1);
+    sp<BufferQueue> bq = new BufferQueue();
+    sp<CpuConsumer> consumer = new CpuConsumer(bq, 1);
     sp<ISurfaceComposer> sf(ComposerService::getComposerService());
     sp<IBinder> display(sf->getBuiltInDisplay(ISurfaceComposer::eDisplayIdMain));
-    ASSERT_EQ(NO_ERROR, sf->captureScreen(display, producer, Rect(),
+    ASSERT_EQ(NO_ERROR, sf->captureScreen(display, bq,
             64, 64, 0, 0x7fffffff, false));
 
     // Set the PROTECTED usage bit and verify that the screenshot fails.  Note
@@ -124,7 +122,7 @@ TEST_F(SurfaceTest, ScreenshotsOfProtectedBuffersSucceed) {
                 &buf));
         ASSERT_EQ(NO_ERROR, anw->queueBuffer(anw.get(), buf, -1));
     }
-    ASSERT_EQ(NO_ERROR, sf->captureScreen(display, producer, Rect(),
+    ASSERT_EQ(NO_ERROR, sf->captureScreen(display, bq,
             64, 64, 0, 0x7fffffff, false));
 }
 
@@ -139,12 +137,10 @@ TEST_F(SurfaceTest, ConcreteTypeIsSurface) {
 TEST_F(SurfaceTest, QueryConsumerUsage) {
     const int TEST_USAGE_FLAGS =
             GRALLOC_USAGE_SW_READ_OFTEN | GRALLOC_USAGE_HW_RENDER;
-    sp<IGraphicBufferProducer> producer;
-    sp<IGraphicBufferConsumer> consumer;
-    BufferQueue::createBufferQueue(&producer, &consumer);
-    sp<BufferItemConsumer> c = new BufferItemConsumer(consumer,
+    sp<BufferQueue> bq = new BufferQueue();
+    sp<BufferItemConsumer> c = new BufferItemConsumer(bq,
             TEST_USAGE_FLAGS);
-    sp<Surface> s = new Surface(producer);
+    sp<Surface> s = new Surface(bq);
 
     sp<ANativeWindow> anw(s);
 

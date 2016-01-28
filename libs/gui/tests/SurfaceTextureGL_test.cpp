@@ -451,7 +451,7 @@ TEST_F(SurfaceTextureGLTest, DisconnectStressTest) {
     };
 
     sp<DisconnectWaiter> dw(new DisconnectWaiter());
-    mConsumer->consumerConnect(dw, false);
+    mBQ->consumerConnect(dw, false);
 
 
     sp<Thread> pt(new ProducerThread(mANW));
