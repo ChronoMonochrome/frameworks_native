@@ -146,7 +146,6 @@ public:
             const sp<IGraphicBufferProducer>& bufferProducer);
     static void setDisplayLayerStack(const sp<IBinder>& token,
             uint32_t layerStack);
-    static void setDisplaySize(const sp<IBinder>& token, uint32_t width, uint32_t height);
 
     /* setDisplayProjection() defines the projection of layer stacks
      * to a given display.
