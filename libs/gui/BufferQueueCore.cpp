@@ -64,9 +64,7 @@ BufferQueueCore::BufferQueueCore(const sp<IGraphicBufferAlloc>& allocator) :
     mMaxAcquiredBufferCount(1),
     mBufferHasBeenQueued(false),
     mFrameCounter(0),
-    mTransformHint(0),
-    mIsAllocating(false),
-    mIsAllocatingCondition()
+    mTransformHint(0)
 {
     if (allocator == NULL) {
         sp<ISurfaceComposer> composer(ComposerService::getComposerService());
@@ -226,13 +224,6 @@ bool BufferQueueCore::stillTracking(const BufferItem* item) const {
     // the buffer would not be moved to a different slot by the producer.
     return (slot.mGraphicBuffer != NULL) &&
            (item->mGraphicBuffer->handle == slot.mGraphicBuffer->handle);
-}
-
-void BufferQueueCore::waitWhileAllocatingLocked() const {
-    ATRACE_CALL();
-    while (mIsAllocating) {
-        mIsAllocatingCondition.wait(mMutex);
-    }
 }
 
 } // namespace android
