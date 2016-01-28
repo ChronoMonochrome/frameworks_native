@@ -23,10 +23,6 @@
 #include <dlfcn.h>
 #include <inttypes.h>
 
-#if defined(HAVE_PTHREADS)
-#include <sys/resource.h>
-#endif
-
 #include <EGL/egl.h>
 
 #include <cutils/log.h>
@@ -78,6 +74,7 @@
 #include "RenderEngine/RenderEngine.h"
 #include <cutils/compiler.h>
 
+
 #define DISPLAY_COUNT       1
 
 /*
@@ -99,7 +96,7 @@ const String16 sDump("android.permission.DUMP");
 // ---------------------------------------------------------------------------
 
 SurfaceFlinger::SurfaceFlinger()
-    :   BnSurfaceComposer(),
+    :   BnSurfaceComposer(), Thread(false),
         mTransactionFlags(0),
         mTransactionPending(false),
         mAnimTransactionPending(false),
@@ -150,7 +147,13 @@ SurfaceFlinger::SurfaceFlinger()
 void SurfaceFlinger::onFirstRef()
 {
     mEventQueue.init(this);
+
+    run("SurfaceFlinger", PRIORITY_URGENT_DISPLAY);
+
+    // Wait for the main thread to be done with its initialization
+    mReadyToRunBarrier.wait();
 }
+
 
 SurfaceFlinger::~SurfaceFlinger()
 {
@@ -410,8 +413,9 @@ status_t SurfaceFlinger::selectEGLConfig(EGLDisplay display, EGLint nativeVisual
     return err;
 }
 
-void SurfaceFlinger::init() {
 
+status_t SurfaceFlinger::readyToRun()
+{
     ALOGI(  "SurfaceFlinger's main thread ready to run. "
             "Initializing graphics H/W...");
 
@@ -513,11 +517,16 @@ void SurfaceFlinger::init() {
     // initialize our drawing state
     mDrawingState = mCurrentState;
 
+    // We're now ready to accept clients...
+    mReadyToRunBarrier.open();
+
     // set initial conditions (e.g. unblank default device)
     initializeDisplays();
 
     // start boot animation
     startBootAnim();
+
+    return NO_ERROR;
 }
 
 int32_t SurfaceFlinger::allocateHwcDisplayId(DisplayDevice::DisplayType type) {
@@ -670,13 +679,9 @@ status_t SurfaceFlinger::postMessageSync(const sp<MessageBase>& msg,
     return res;
 }
 
-void SurfaceFlinger::run() {
-#if defined(HAVE_PTHREADS)
-    setpriority(PRIO_PROCESS, 0, PRIORITY_URGENT_DISPLAY);
-#endif
-    do {
-        waitForEvent();
-    } while (true);
+bool SurfaceFlinger::threadLoop() {
+    waitForEvent();
+    return true;
 }
 
 void SurfaceFlinger::onVSyncReceived(int type, nsecs_t timestamp) {

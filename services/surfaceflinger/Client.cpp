@@ -18,7 +18,6 @@
 #include <sys/types.h>
 
 #include <binder/PermissionCache.h>
-#include <binder/IPCThreadState.h>
 
 #include <private/android_filesystem_config.h>
 

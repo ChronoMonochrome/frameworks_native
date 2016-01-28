@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-#include <binder/IServiceManager.h>
-#include <binder/IPCThreadState.h>
-#include <binder/ProcessState.h>
-#include <binder/IServiceManager.h>
+#include <binder/BinderService.h>
 #include "SurfaceFlinger.h"
 
 using namespace android;
@@ -26,23 +23,6 @@ int main(int, char**) {
     // When SF is launched in its own process, limit the number of
     // binder threads to 4.
     ProcessState::self()->setThreadPoolMaxThreadCount(4);
-
-    // instantiate surfaceflinger
-    sp<SurfaceFlinger> flinger = new SurfaceFlinger();
-
-    // initialize before clients can connect
-    flinger->init();
-
-    // start the thread pool
-    sp<ProcessState> ps(ProcessState::self());
-    ps->startThreadPool();
-
-    // publish surface flinger
-    sp<IServiceManager> sm(defaultServiceManager());
-    sm->addService(String16(SurfaceFlinger::getServiceName()), flinger, false);
-
-    // run in this thread
-    flinger->run();
-
+    SurfaceFlinger::publishAndJoinThreadPool(true);
     return 0;
 }
