@@ -49,9 +49,6 @@ class String8;
 
 class SurfaceTexture : public ConsumerBase {
 public:
-#ifdef STE_HARDWARE
-    enum { NUM_BLIT_BUFFER_SLOTS = 2 };
-#endif
     typedef ConsumerBase::FrameAvailableListener FrameAvailableListener;
 
     // SurfaceTexture constructs a new SurfaceTexture object. tex indicates the
@@ -416,7 +413,7 @@ private:
     // mBlitSlots contains several buffers which will
     // be rendered alternately in case color transform is needed (instead
     // of rendering the buffers in mSlots).
-    EGLSlot mBlitSlots[NUM_BLIT_BUFFER_SLOTS];
+    EGLSlot mBlitSlots[BufferQueue::NUM_BLIT_BUFFER_SLOTS];
 
     // mGraphicBufferAlloc is the connection to SurfaceFlinger that is used to
     // allocate new GraphicBuffer objects.

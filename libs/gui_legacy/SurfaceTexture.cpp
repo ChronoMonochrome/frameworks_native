@@ -150,8 +150,7 @@ SurfaceTexture::SurfaceTexture(GLuint tex, bool allowSynchronousMode,
             sizeof(mCurrentTransformMatrix));
 
 #ifdef STE_HARDWARE
-
-    for (int i = 0; i < NUM_BLIT_BUFFER_SLOTS; i++) {
+    for (int i = 0; i < BufferQueue::NUM_BLIT_BUFFER_SLOTS; i++) {
         mBlitSlots[i].mEglImage = EGL_NO_IMAGE_KHR;
         mBlitSlots[i].mEglDisplay = EGL_NO_DISPLAY;
     }
@@ -161,7 +160,7 @@ SurfaceTexture::SurfaceTexture(GLuint tex, bool allowSynchronousMode,
     if (hw_get_module(COPYBIT_HARDWARE_MODULE_ID, &module) == 0) {
         copybit_open(module, &mBlitEngine);
     }
-    ALOGE_IF(!mBlitEngine, "\nCannot open copybit mBlitEngine=%p", mBlitEngine);
+    ALOGE_IF(!mBlitEngine, "Cannot open copybit mBlitEngine=%p", mBlitEngine);
 #endif
 
     mBufferQueue->setConsumerUsageBits(DEFAULT_USAGE_FLAGS);
@@ -351,7 +350,7 @@ status_t SurfaceTexture::updateTexImage(BufferRejecter* rejecter, bool skipSync,
             }
             // mBlitSlots contains several buffers (NUM_BLIT_BUFFER_SLOTS),
             // advance (potentially wrap) the index
-            mNextBlitSlot = (mNextBlitSlot + 1) % NUM_BLIT_BUFFER_SLOTS;
+            mNextBlitSlot = (mNextBlitSlot + 1) % BufferQueue::NUM_BLIT_BUFFER_SLOTS;
         } else {
             mNeedsConversion = false;
             image = mEglSlots[buf].mEglImage;
@@ -377,7 +376,11 @@ status_t SurfaceTexture::updateTexImage(BufferRejecter* rejecter, bool skipSync,
         // we call the rejecter here, in case the caller has a reason to
         // not accept this buffer. this is used by SurfaceFlinger to
         // reject buffers which have the wrong size
+#ifdef STE_HARDWARE
+        if (rejecter && rejecter->reject(item.mGraphicBuffer, item)) {
+#else
         if (rejecter && rejecter->reject(mSlots[buf].mGraphicBuffer, item)) {
+#endif
             releaseBufferLocked(buf, dpy, EGL_NO_SYNC_KHR);
             glBindTexture(mTexTarget, mTexName);
             return NO_ERROR;
@@ -523,6 +526,12 @@ status_t SurfaceTexture::detachFromContext() {
             mEglSlots[i].mEglImage = EGL_NO_IMAGE_KHR;
         }
     }
+
+#ifdef STE_HARDWARE
+    if (mBlitEngine) {
+        copybit_close(mBlitEngine);
+    }
+#endif
 
     mEglDisplay = EGL_NO_DISPLAY;
     mEglContext = EGL_NO_CONTEXT;
@@ -986,21 +995,6 @@ void SurfaceTexture::abandonLocked() {
     ST_LOGV("abandonLocked");
     mCurrentTextureBuf.clear();
     ConsumerBase::abandonLocked();
-#ifdef STE_HARDWARE
-    for (int i = 0; i < NUM_BLIT_BUFFER_SLOTS; i++) {
-        mBlitSlots[i].mGraphicBuffer = 0;
-        if (mBlitSlots[i].mEglImage != EGL_NO_IMAGE_KHR) {
-            eglDestroyImageKHR(mBlitSlots[i].mEglDisplay, mBlitSlots[i].mEglImage);
-            mBlitSlots[i].mEglImage = EGL_NO_IMAGE_KHR;
-            mBlitSlots[i].mEglDisplay = EGL_NO_DISPLAY;
-        }
-    }
-#endif
-#ifdef STE_HARDWARE
-    if (mBlitEngine) {
-        copybit_close(mBlitEngine);
-    }
-#endif
 }
 
 void SurfaceTexture::setName(const String8& name) {
@@ -1057,7 +1051,7 @@ status_t SurfaceTexture::convert() {
         return NO_ERROR;
 
     if (mConversionBltSlot < 0 ||
-            mConversionBltSlot >= NUM_BLIT_BUFFER_SLOTS ||
+            mConversionBltSlot >= BufferQueue::NUM_BLIT_BUFFER_SLOTS ||
             mConversionSrcSlot < 0 ||
             mConversionSrcSlot >= BufferQueue::NUM_BUFFER_SLOTS) {
         ALOGE_IF(STE_DEFERDBG, "%s: Incorrect setup for deferred "
