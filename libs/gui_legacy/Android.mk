@@ -29,7 +29,6 @@ LOCAL_SRC_FILES:= \
 
 LOCAL_SHARED_LIBRARIES := \
 	libbinder \
-	libhardware \
 	libcutils \
 	libEGL \
 	libGLESv2 \
