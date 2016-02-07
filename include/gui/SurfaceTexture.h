@@ -38,8 +38,6 @@
 #endif
 
 #define ANDROID_GRAPHICS_SURFACETEXTURE_JNI_ID "mSurfaceTexture"
-#define ANDROID_GRAPHICS_FRAMEAVAILABLELISTENER_JNI_ID \
-                                         "mFrameAvailableListener"
 
 namespace android {
 // ----------------------------------------------------------------------------

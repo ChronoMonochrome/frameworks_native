@@ -2,7 +2,7 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := libgui_legcay_test
+LOCAL_MODULE := libgui_legacy_test
 
 LOCAL_MODULE_TAGS := tests
 

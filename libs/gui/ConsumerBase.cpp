@@ -99,7 +99,7 @@ void ConsumerBase::onFrameAvailable() {
     sp<FrameAvailableListener> listener;
     { // scope for the lock
         Mutex::Autolock lock(mMutex);
-        listener = mFrameAvailableListener.promote();
+        listener = mFrameAvailableListener;
     }
 
     if (listener != NULL) {
@@ -148,7 +148,7 @@ void ConsumerBase::abandonLocked() {
 }
 
 void ConsumerBase::setFrameAvailableListener(
-        const wp<FrameAvailableListener>& listener) {
+        const sp<FrameAvailableListener>& listener) {
     CB_LOGV("setFrameAvailableListener");
     Mutex::Autolock lock(mMutex);
     mFrameAvailableListener = listener;
