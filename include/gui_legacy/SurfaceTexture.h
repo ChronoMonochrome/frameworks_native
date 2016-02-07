@@ -22,9 +22,9 @@
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 
-#include <gui/ISurfaceTexture.h>
-#include <gui/BufferQueue.h>
-#include <gui/ConsumerBase.h>
+#include <gui_legacy/ISurfaceTexture.h>
+#include <gui_legacy/BufferQueue.h>
+#include <gui_legacy/ConsumerBase.h>
 
 #include <ui/GraphicBuffer.h>
 

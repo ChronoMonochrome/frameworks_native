@@ -17,7 +17,7 @@
 #ifndef ANDROID_GUI_BUFFERITEMCONSUMER_H
 #define ANDROID_GUI_BUFFERITEMCONSUMER_H
 
-#include <gui/ConsumerBase.h>
+#include <gui_legacy/ConsumerBase.h>
 
 #include <ui/GraphicBuffer.h>
 

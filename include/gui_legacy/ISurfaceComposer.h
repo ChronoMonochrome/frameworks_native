@@ -27,8 +27,8 @@
 
 #include <ui/PixelFormat.h>
 
-#include <gui/IGraphicBufferAlloc.h>
-#include <gui/ISurfaceComposerClient.h>
+#include <gui_legacy/IGraphicBufferAlloc.h>
+#include <gui_legacy/ISurfaceComposerClient.h>
 
 namespace android {
 // ----------------------------------------------------------------------------

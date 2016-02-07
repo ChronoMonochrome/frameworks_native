@@ -17,7 +17,7 @@
 #ifndef ANDROID_GUI_DUMMYCONSUMER_H
 #define ANDROID_GUI_DUMMYCONSUMER_H
 
-#include <gui/BufferQueue.h>
+#include <gui_legacy/BufferQueue.h>
 
 namespace android {
 // ----------------------------------------------------------------------------

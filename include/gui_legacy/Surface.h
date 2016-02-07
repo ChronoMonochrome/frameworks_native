@@ -27,9 +27,9 @@
 #include <ui/PixelFormat.h>
 #include <ui/Region.h>
 
-#include <gui/SurfaceTextureClient.h>
-#include <gui/ISurface.h>
-#include <gui/ISurfaceComposerClient.h>
+#include <gui_legacy/SurfaceTextureClient.h>
+#include <gui_legacy/ISurface.h>
+#include <gui_legacy/ISurfaceComposerClient.h>
 
 #define ANDROID_VIEW_SURFACE_JNI_ID    "mNativeSurface"
 

@@ -27,7 +27,7 @@
 #include <utils/Singleton.h>
 #include <utils/Vector.h>
 
-#include <gui/SensorEventQueue.h>
+#include <gui_legacy/SensorEventQueue.h>
 
 // ----------------------------------------------------------------------------
 // Concrete types for the NDK

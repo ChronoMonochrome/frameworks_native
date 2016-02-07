@@ -29,7 +29,7 @@
 
 #include <ui/PixelFormat.h>
 
-#include <gui/Surface.h>
+#include <gui_legacy/Surface.h>
 
 namespace android {
 

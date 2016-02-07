@@ -17,9 +17,9 @@
 #ifndef ANDROID_GUI_SURFACETEXTURECLIENT_H
 #define ANDROID_GUI_SURFACETEXTURECLIENT_H
 
-#include <gui/ISurfaceTexture.h>
-#include <gui/SurfaceTexture.h>
-#include <gui/BufferQueue.h>
+#include <gui_legacy/ISurfaceTexture.h>
+#include <gui_legacy/SurfaceTexture.h>
+#include <gui_legacy/BufferQueue.h>
 
 #include <ui/ANativeObjectBase.h>
 #include <ui/Region.h>

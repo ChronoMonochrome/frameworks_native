@@ -27,7 +27,7 @@
 
 #include <ui/PixelFormat.h>
 
-#include <gui/ISurface.h>
+#include <gui_legacy/ISurface.h>
 
 namespace android {
 // ----------------------------------------------------------------------------

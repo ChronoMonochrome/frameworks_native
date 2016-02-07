@@ -20,8 +20,8 @@
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 
-#include <gui/IGraphicBufferAlloc.h>
-#include <gui/ISurfaceTexture.h>
+#include <gui_legacy/IGraphicBufferAlloc.h>
+#include <gui_legacy/ISurfaceTexture.h>
 
 #include <ui/Fence.h>
 #include <ui/GraphicBuffer.h>

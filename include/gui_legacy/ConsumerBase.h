@@ -17,7 +17,7 @@
 #ifndef ANDROID_GUI_CONSUMERBASE_H
 #define ANDROID_GUI_CONSUMERBASE_H
 
-#include <gui/BufferQueue.h>
+#include <gui_legacy/BufferQueue.h>
 
 #include <ui/GraphicBuffer.h>
 

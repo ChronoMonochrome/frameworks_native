@@ -17,7 +17,7 @@
 #ifndef ANDROID_GUI_CPUCONSUMER_H
 #define ANDROID_GUI_CPUCONSUMER_H
 
-#include <gui/ConsumerBase.h>
+#include <gui_legacy/ConsumerBase.h>
 
 #include <ui/GraphicBuffer.h>
 

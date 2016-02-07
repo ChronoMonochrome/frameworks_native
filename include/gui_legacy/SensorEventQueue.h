@@ -24,7 +24,7 @@
 #include <utils/RefBase.h>
 #include <utils/Timers.h>
 
-#include <gui/BitTube.h>
+#include <gui_legacy/BitTube.h>
 
 // ----------------------------------------------------------------------------
 
