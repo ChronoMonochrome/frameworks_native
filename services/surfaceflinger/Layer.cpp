@@ -541,9 +541,6 @@ void Layer::onPostComposition() {
         mFrameTracker.setDesiredPresentTime(desiredPresentTime);
 
         sp<Fence> frameReadyFence = mSurfaceTexture->getCurrentFence();
-        // XXX: Temporarily don't use the fence from the SurfaceTexture to
-        // work around a driver bug.
-        frameReadyFence.clear();
         if (frameReadyFence != NULL) {
             mFrameTracker.setFrameReadyFence(frameReadyFence);
         } else {
@@ -554,9 +551,6 @@ void Layer::onPostComposition() {
 
         const HWComposer& hwc = mFlinger->getHwComposer();
         sp<Fence> presentFence = hwc.getDisplayFence(HWC_DISPLAY_PRIMARY);
-        // XXX: Temporarily don't use the present fence from HWC to work
-        // around a driver bug.
-        presentFence.clear();
         if (presentFence != NULL) {
             mFrameTracker.setActualPresentFence(presentFence);
         } else {
