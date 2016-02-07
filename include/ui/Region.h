@@ -30,6 +30,10 @@
 
 #include <utils/Flattenable.h>
 
+#ifdef STE_HARDWARE
+#include <hardware/copybit.h>
+#endif
+
 namespace android {
 // ---------------------------------------------------------------------------
 

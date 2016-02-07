@@ -28,6 +28,8 @@
 #include <utils/threads.h>
 #include <utils/KeyedVector.h>
 
+#define ANDROID_VIEW_SURFACE_JNI_ID    "mNativeSurface"
+
 struct ANativeWindow_Buffer;
 
 namespace android {

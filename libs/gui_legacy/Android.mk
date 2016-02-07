@@ -35,6 +35,7 @@ LOCAL_SHARED_LIBRARIES := \
 	libGLESv2 \
 	libsync \
 	libui \
+        libhardware \
 	libutils \
 
 

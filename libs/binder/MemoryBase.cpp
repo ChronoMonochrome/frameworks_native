@@ -24,7 +24,6 @@
 namespace android {
 
 // ---------------------------------------------------------------------------
-
 MemoryBase::MemoryBase(const sp<IMemoryHeap>& heap,
         ssize_t offset, size_t size)
     : mSize(size), mOffset(offset), mHeap(heap)
