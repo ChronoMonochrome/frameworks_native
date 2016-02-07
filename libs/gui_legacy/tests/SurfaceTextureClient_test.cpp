@@ -19,7 +19,7 @@
 
 #include <EGL/egl.h>
 #include <gtest/gtest.h>
-#include <gui/SurfaceTextureClient.h>
+#include <gui_legacy/SurfaceTextureClient.h>
 #include <system/graphics.h>
 #include <utils/Log.h>
 #include <utils/Thread.h>

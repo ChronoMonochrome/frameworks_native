@@ -14,30 +14,16 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "DummyConsumer"
-// #define LOG_NDEBUG 0
+#ifndef ANDROID_GUI_CONFIG_H
+#define ANDROID_GUI_CONFIG_H
 
-#include <gui_legacy/DummyConsumer.h>
-
-#include <utils/Log.h>
 #include <utils/String8.h>
 
 namespace android {
 
-DummyConsumer::DummyConsumer() {
-    ALOGV("DummyConsumer");
-}
-
-DummyConsumer::~DummyConsumer() {
-    ALOGV("~DummyConsumer");
-}
-
-void DummyConsumer::onFrameAvailable() {
-    ALOGV("onFrameAvailable");
-}
-
-void DummyConsumer::onBuffersReleased() {
-    ALOGV("onBuffersReleased");
-}
+// Append the libgui configuration details to configStr.
+void appendGuiConfigString(String8& configStr);
 
 }; // namespace android
+
+#endif /*ANDROID_GUI_CONFIG_H*/

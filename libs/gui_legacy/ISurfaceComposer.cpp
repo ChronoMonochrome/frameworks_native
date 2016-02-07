@@ -25,10 +25,10 @@
 #include <binder/IPCThreadState.h>
 #include <binder/IServiceManager.h>
 
-#include <gui/BitTube.h>
-#include <gui/IDisplayEventConnection.h>
-#include <gui/ISurfaceComposer.h>
-#include <gui/ISurfaceTexture.h>
+#include <gui_legacy/BitTube.h>
+#include <gui_legacy/IDisplayEventConnection.h>
+#include <gui_legacy/ISurfaceComposer.h>
+#include <gui_legacy/ISurfaceTexture.h>
 
 #include <private/gui/LayerState.h>
 

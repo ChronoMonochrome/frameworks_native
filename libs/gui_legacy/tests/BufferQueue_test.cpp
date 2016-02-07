@@ -25,7 +25,7 @@
 #include <ui/GraphicBuffer.h>
 #include <ui/FramebufferNativeWindow.h>
 
-#include <gui/BufferQueue.h>
+#include <gui_legacy/BufferQueue.h>
 
 namespace android {
 

@@ -25,7 +25,7 @@
 
 #include <binder/Parcel.h>
 
-#include <gui/BitTube.h>
+#include <gui_legacy/BitTube.h>
 
 namespace android {
 // ----------------------------------------------------------------------------

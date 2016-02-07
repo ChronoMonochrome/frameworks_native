@@ -18,15 +18,15 @@
 //#define LOG_NDEBUG 0
 
 #include <gtest/gtest.h>
-#include <gui/SurfaceTexture.h>
-#include <gui/SurfaceTextureClient.h>
+#include <gui_legacy/SurfaceTexture.h>
+#include <gui_legacy/SurfaceTextureClient.h>
 #include <ui/GraphicBuffer.h>
 #include <utils/String8.h>
 #include <utils/threads.h>
 
-#include <gui/ISurfaceComposer.h>
-#include <gui/Surface.h>
-#include <gui/SurfaceComposerClient.h>
+#include <gui_legacy/ISurfaceComposer.h>
+#include <gui_legacy/Surface.h>
+#include <gui_legacy/SurfaceComposerClient.h>
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>

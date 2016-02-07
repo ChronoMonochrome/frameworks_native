@@ -17,9 +17,9 @@
 #include <gtest/gtest.h>
 
 #include <binder/IMemory.h>
-#include <gui/ISurfaceComposer.h>
-#include <gui/Surface.h>
-#include <gui/SurfaceComposerClient.h>
+#include <gui_legacy/ISurfaceComposer.h>
+#include <gui_legacy/Surface.h>
+#include <gui_legacy/SurfaceComposerClient.h>
 #include <utils/String8.h>
 
 #include <private/gui/ComposerService.h>

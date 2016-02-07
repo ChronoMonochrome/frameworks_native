@@ -25,8 +25,8 @@
 #endif
 
 #include <gtest/gtest.h>
-#include <gui/CpuConsumer.h>
-#include <gui/SurfaceTextureClient.h>
+#include <gui_legacy/CpuConsumer.h>
+#include <gui_legacy/SurfaceTextureClient.h>
 #include <ui/GraphicBuffer.h>
 #include <utils/String8.h>
 #include <utils/Thread.h>

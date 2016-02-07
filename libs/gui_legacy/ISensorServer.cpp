@@ -25,9 +25,9 @@
 #include <binder/Parcel.h>
 #include <binder/IInterface.h>
 
-#include <gui/Sensor.h>
-#include <gui/ISensorServer.h>
-#include <gui/ISensorEventConnection.h>
+#include <gui_legacy/Sensor.h>
+#include <gui_legacy/ISensorServer.h>
+#include <gui_legacy/ISensorEventConnection.h>
 
 namespace android {
 // ----------------------------------------------------------------------------

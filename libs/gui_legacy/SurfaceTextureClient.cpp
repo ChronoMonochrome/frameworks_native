@@ -25,10 +25,10 @@
 
 #include <ui/Fence.h>
 
-#include <gui/ISurfaceComposer.h>
-#include <gui/SurfaceComposerClient.h>
-#include <gui/SurfaceTexture.h>
-#include <gui/SurfaceTextureClient.h>
+#include <gui_legacy/ISurfaceComposer.h>
+#include <gui_legacy/SurfaceComposerClient.h>
+#include <gui_legacy/SurfaceTexture.h>
+#include <gui_legacy/SurfaceTextureClient.h>
 
 #include <private/gui/ComposerService.h>
 

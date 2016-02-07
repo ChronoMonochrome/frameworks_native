@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <gui/GuiConfig.h>
+#include <gui_legacy/GuiConfig.h>
 
 namespace android {
 

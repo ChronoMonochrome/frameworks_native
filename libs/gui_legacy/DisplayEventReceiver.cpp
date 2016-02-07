@@ -18,10 +18,10 @@
 
 #include <utils/Errors.h>
 
-#include <gui/BitTube.h>
-#include <gui/DisplayEventReceiver.h>
-#include <gui/IDisplayEventConnection.h>
-#include <gui/ISurfaceComposer.h>
+#include <gui_legacy/BitTube.h>
+#include <gui_legacy/DisplayEventReceiver.h>
+#include <gui_legacy/IDisplayEventConnection.h>
+#include <gui_legacy/ISurfaceComposer.h>
 
 #include <private/gui/ComposerService.h>
 

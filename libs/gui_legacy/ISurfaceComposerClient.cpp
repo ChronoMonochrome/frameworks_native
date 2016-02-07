@@ -29,8 +29,8 @@
 #include <ui/Point.h>
 #include <ui/Rect.h>
 
-#include <gui/ISurface.h>
-#include <gui/ISurfaceComposerClient.h>
+#include <gui_legacy/ISurface.h>
+#include <gui_legacy/ISurfaceComposerClient.h>
 #include <private/gui/LayerState.h>
 
 // ---------------------------------------------------------------------------

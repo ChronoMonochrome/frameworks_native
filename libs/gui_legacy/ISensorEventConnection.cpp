@@ -24,8 +24,8 @@
 #include <binder/Parcel.h>
 #include <binder/IInterface.h>
 
-#include <gui/ISensorEventConnection.h>
-#include <gui/BitTube.h>
+#include <gui_legacy/ISensorEventConnection.h>
+#include <gui_legacy/BitTube.h>
 
 namespace android {
 // ----------------------------------------------------------------------------

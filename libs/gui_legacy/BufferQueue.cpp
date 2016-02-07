@@ -24,12 +24,12 @@
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 
-#include <gui/BufferQueue.h>
-#include <gui/ISurfaceComposer.h>
+#include <gui_legacy/BufferQueue.h>
+#include <gui_legacy/ISurfaceComposer.h>
 #include <private/gui/ComposerService.h>
 
 #include <utils/Log.h>
-#include <gui/SurfaceTexture.h>
+#include <gui_legacy/SurfaceTexture.h>
 #include <utils/Trace.h>
 
 // Macros for including the BufferQueue name in log messages

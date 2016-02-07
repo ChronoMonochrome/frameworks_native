@@ -28,10 +28,10 @@
 
 #include <hardware/hardware.h>
 
-#include <gui/IGraphicBufferAlloc.h>
-#include <gui/ISurfaceComposer.h>
-#include <gui/SurfaceComposerClient.h>
-#include <gui/SurfaceTexture.h>
+#include <gui_legacy/IGraphicBufferAlloc.h>
+#include <gui_legacy/ISurfaceComposer.h>
+#include <gui_legacy/SurfaceComposerClient.h>
+#include <gui_legacy/SurfaceTexture.h>
 
 #include <private/gui/ComposerService.h>
 

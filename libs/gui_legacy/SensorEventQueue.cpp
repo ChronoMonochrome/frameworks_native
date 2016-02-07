@@ -23,10 +23,10 @@
 #include <utils/RefBase.h>
 #include <utils/Looper.h>
 
-#include <gui/Sensor.h>
-#include <gui/BitTube.h>
-#include <gui/SensorEventQueue.h>
-#include <gui/ISensorEventConnection.h>
+#include <gui_legacy/Sensor.h>
+#include <gui_legacy/BitTube.h>
+#include <gui_legacy/SensorEventQueue.h>
+#include <gui_legacy/ISensorEventConnection.h>
 
 #include <android/sensor.h>
 

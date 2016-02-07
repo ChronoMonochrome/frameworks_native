@@ -16,8 +16,8 @@
 
 #include <utils/Errors.h>
 #include <binder/Parcel.h>
-#include <gui/ISurfaceComposerClient.h>
-#include <gui/ISurfaceTexture.h>
+#include <gui_legacy/ISurfaceComposerClient.h>
+#include <gui_legacy/ISurfaceTexture.h>
 #include <private/gui/LayerState.h>
 
 namespace android {

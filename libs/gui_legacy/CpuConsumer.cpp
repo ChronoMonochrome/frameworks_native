@@ -19,7 +19,7 @@
 #define ATRACE_TAG ATRACE_TAG_GRAPHICS
 #include <utils/Log.h>
 
-#include <gui/CpuConsumer.h>
+#include <gui_legacy/CpuConsumer.h>
 
 #define CC_LOGV(x, ...) ALOGV("[%s] "x, mName.string(), ##__VA_ARGS__)
 #define CC_LOGD(x, ...) ALOGD("[%s] "x, mName.string(), ##__VA_ARGS__)

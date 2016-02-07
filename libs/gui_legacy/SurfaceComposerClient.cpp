@@ -31,10 +31,10 @@
 
 #include <ui/DisplayInfo.h>
 
-#include <gui/ISurface.h>
-#include <gui/ISurfaceComposer.h>
-#include <gui/ISurfaceComposerClient.h>
-#include <gui/SurfaceComposerClient.h>
+#include <gui_legacy/ISurface.h>
+#include <gui_legacy/ISurfaceComposer.h>
+#include <gui_legacy/ISurfaceComposerClient.h>
+#include <gui_legacy/SurfaceComposerClient.h>
 
 #include <private/gui/ComposerService.h>
 #include <private/gui/LayerState.h>

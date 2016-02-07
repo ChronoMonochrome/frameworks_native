@@ -34,11 +34,11 @@
 #include <ui/GraphicBuffer.h>
 #include <ui/Rect.h>
 
-#include <gui/ISurface.h>
-#include <gui/ISurfaceComposer.h>
-#include <gui/Surface.h>
-#include <gui/SurfaceComposerClient.h>
-#include <gui/SurfaceTextureClient.h>
+#include <gui_legacy/ISurface.h>
+#include <gui_legacy/ISurfaceComposer.h>
+#include <gui_legacy/Surface.h>
+#include <gui_legacy/SurfaceComposerClient.h>
+#include <gui_legacy/SurfaceTextureClient.h>
 
 namespace android {
 

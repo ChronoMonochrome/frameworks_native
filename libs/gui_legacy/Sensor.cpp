@@ -23,7 +23,7 @@
 
 #include <hardware/sensors.h>
 
-#include <gui/Sensor.h>
+#include <gui_legacy/Sensor.h>
 
 // ----------------------------------------------------------------------------
 namespace android {
