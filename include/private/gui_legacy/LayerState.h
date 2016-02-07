@@ -24,7 +24,7 @@
 
 #include <ui/Region.h>
 #include <ui/Rect.h>
-#include <gui/ISurface.h>
+#include <gui_legacy/ISurface.h>
 
 namespace android {
 
@@ -114,7 +114,7 @@ struct DisplayState {
 
     uint32_t what;
     sp<IBinder> token;
-    sp<ISurfaceTexture> surface;
+    sp<IGraphicBufferProducer> surface;
     uint32_t layerStack;
     uint32_t orientation;
     Rect viewport;
