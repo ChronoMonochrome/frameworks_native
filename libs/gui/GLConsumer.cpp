@@ -144,6 +144,14 @@ GLConsumer::GLConsumer(const sp<IGraphicBufferConsumer>& bq, uint32_t tex,
             sizeof(mCurrentTransformMatrix));
 
 #ifdef STE_HARDWARE
+
+    for (int i = 0; i < BufferQueue::NUM_BLIT_BUFFER_SLOTS; i++) {
+        if (mEglSlots[i].mEglImage != EGL_NO_IMAGE_KHR) {
+            eglDestroyImageKHR(mEglDisplay, mEglSlots[i].mEglImage);
+            mEglSlots[i].mEglImage = EGL_NO_IMAGE_KHR;
+        }
+    }
+
     hw_module_t const* module;
     mBlitEngine = 0;
     if (hw_get_module(COPYBIT_HARDWARE_MODULE_ID, &module) == 0) {
@@ -173,6 +181,13 @@ status_t GLConsumer::setDefaultMaxBufferCount(int bufferCount) {
 GLConsumer::~GLConsumer() {
     ST_LOGV("~GLConsumer");
     abandon();
+
+    for (int i = 0; i < BufferQueue::NUM_BLIT_BUFFER_SLOTS; i++) {
+        if (mEglSlots[i].mEglImage != EGL_NO_IMAGE_KHR) {
+            eglDestroyImageKHR(mEglDisplay, mEglSlots[i].mEglImage);
+            mEglSlots[i].mEglImage = EGL_NO_IMAGE_KHR;
+        }
+    }
 
     if (mBlitEngine) {
         copybit_close(mBlitEngine);
@@ -424,11 +439,6 @@ status_t GLConsumer::updateAndReleaseLocked(const BufferQueue::BufferItem& item)
     sp<GraphicBuffer> textureBuffer;
     if (mSlots[buf].mGraphicBuffer->getPixelFormat() == HAL_PIXEL_FORMAT_YCBCR42XMBN
      || mSlots[buf].mGraphicBuffer->getPixelFormat() == HAL_PIXEL_FORMAT_YCbCr_420_P) {
-        /* deallocate image each time .... */
-        if (mEglSlots[buf].mEglImage != EGL_NO_IMAGE_KHR) {
-            eglDestroyImageKHR(mEglDisplay, mEglSlots[buf].mEglImage);
-            mEglSlots[buf].mEglImage = EGL_NO_IMAGE_KHR;
-        }
         /* test if source and convert buffer size are ok */
         if (mSlots[buf].mGraphicBuffer != NULL && mBlitSlots[mNextBlitSlot] != NULL) {
             sp<GraphicBuffer> &srcBuf = mSlots[buf].mGraphicBuffer;
@@ -1240,11 +1250,19 @@ status_t GLConsumer::convert(sp<GraphicBuffer> &srcBuf, sp<GraphicBuffer> &dstBu
     mBlitEngine->set_parameter(mBlitEngine, COPYBIT_DITHER, COPYBIT_ENABLE);
 
     int err = mBlitEngine->stretch(
-            mBlitEngine, &dstImg, &srcImg, &dstCrop, &srcCrop, &clip);
+             mBlitEngine, &dstImg, &srcImg, &dstCrop, &srcCrop, &clip);
+
     if (err != 0) {
-        ALOGE("\nError: Blit stretch operation failed (err:%d)\n", err);
-        /* return ok to not block decoding. But why this error ? */
-        return OK;
+        ALOGE("Error: Blit stretch operation failed, retry once (err:%d)", err);
+        // TODO: Bad boy doing hacks here, blit stretch operation should be completely fixed.
+        int err = mBlitEngine->stretch(
+              mBlitEngine, &dstImg, &srcImg, &dstCrop, &srcCrop, &clip);
+        if (err != 0) {
+            ALOGE("Error: Blit stretch operation failed (err:%d)", err);
+
+            /* return ok to not block decoding. But why this error ? */
+            return OK;
+        }
     }
     return OK;
 }
