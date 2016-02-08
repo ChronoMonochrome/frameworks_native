@@ -36,6 +36,9 @@
 #include <binder/PermissionCache.h>
 
 #include <ui/DisplayInfo.h>
+#ifdef STE_HARDWARE
+#include <ui/FramebufferNativeWindow.h>
+#endif
 
 #include <gui/BitTube.h>
 #include <gui/BufferQueue.h>
@@ -1339,8 +1342,12 @@ void SurfaceFlinger::setVirtualDisplayData(
     int32_t hwcDisplayId,
     const sp<IGraphicBufferProducer>& sink)
 {
+#ifdef STE_HARDWARE
+    ANativeWindow* const window = new FramebufferNativeWindow();
+#else
     sp<ANativeWindow> mNativeWindow = new Surface(sink);
     ANativeWindow* const window = mNativeWindow.get();
+#endif
 
     int format;
     window->query(window, NATIVE_WINDOW_FORMAT, &format);
