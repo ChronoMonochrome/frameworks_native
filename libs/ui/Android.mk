@@ -44,6 +44,8 @@ endif
 
 LOCAL_MODULE:= libui
 
+LOCAL_SYSTEM_SHARED_LIBRARIES := libc libstdc++ libw
+
 include $(BUILD_SHARED_LIBRARY)
 
 

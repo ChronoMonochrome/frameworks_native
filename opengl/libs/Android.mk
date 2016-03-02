@@ -33,6 +33,7 @@ LOCAL_SRC_FILES:= 	       \
 #
 
 LOCAL_SHARED_LIBRARIES += libcutils libutils liblog libGLES_trace
+LOCAL_SYSTEM_SHARED_LIBRARIES := libc libw libstdc++
 LOCAL_MODULE:= libEGL
 LOCAL_LDFLAGS += -Wl,--exclude-libs=ALL
 LOCAL_SHARED_LIBRARIES += libdl
@@ -84,6 +85,7 @@ LOCAL_SRC_FILES:= 		\
 	GLES_CM/gl.cpp.arm 	\
 #
 
+LOCAL_SYSTEM_SHARED_LIBRARIES := libc libw libstdc++
 LOCAL_SHARED_LIBRARIES += libcutils liblog libEGL
 LOCAL_MODULE:= libGLESv1_CM
 
@@ -111,6 +113,7 @@ LOCAL_SRC_FILES:= 		\
 LOCAL_SHARED_LIBRARIES += libcutils libutils liblog libEGL
 LOCAL_MODULE:= libGLESv2
 
+LOCAL_SYSTEM_SHARED_LIBRARIES := libc libw libstdc++
 LOCAL_SHARED_LIBRARIES += libdl
 # we need to access the private Bionic header <bionic_tls.h>
 LOCAL_C_INCLUDES += bionic/libc/private

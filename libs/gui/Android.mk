@@ -65,6 +65,8 @@ endif
 
 LOCAL_MODULE:= libgui
 
+LOCAL_SYSTEM_SHARED_LIBRARIES := libc libstdc++ libw
+
 ifeq ($(TARGET_BOARD_PLATFORM), tegra)
 	LOCAL_CFLAGS += -DDONT_USE_FENCE_SYNC
 endif
